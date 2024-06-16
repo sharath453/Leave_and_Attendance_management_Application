@@ -27,6 +27,39 @@ class ApiService {
     }
   }
 
+  Future<bool> register(
+      String username, String password, String email, String role) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/register.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(<String, String>{
+          'username': username,
+          'password': password,
+          'email': email,
+          'role': role,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        if (responseBody['success'] != null) {
+          return true;
+        } else {
+          print('Error: ${responseBody['error']}');
+          return false;
+        }
+      } else {
+        print('Failed to register: ${response.reasonPhrase}');
+        return false;
+      }
+    } catch (e) {
+      print('Failed to register: $e');
+      return false;
+    }
+  }
+
   Future<List<dynamic>> fetchLeaveApplications(int hodId) async {
     try {
       final response = await http

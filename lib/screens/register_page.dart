@@ -1,75 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:leave_management_app/screens/faculty/faculty_home.dart';
-import 'package:leave_management_app/screens/hod/hod_home.dart';
-import 'package:leave_management_app/screens/student/student_home.dart';
-import 'package:leave_management_app/screens/register_page.dart';
 import 'package:leave_management_app/services/api_service.dart';
 import 'package:leave_management_app/widgets/my_button.dart';
 import 'package:leave_management_app/widgets/my_text_field.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  RegisterPage({Key? key}) : super(key: key);
 
+  @override
+  _RegisterPageState createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final ApiService apiService = ApiService();
+  String selectedRole = 'student'; // Default selected role
 
-  void signUserIn(BuildContext context) async {
+  void registerUser(BuildContext context) async {
     String username = usernameController.text;
     String password = passwordController.text;
+    String email = emailController.text;
+    String role = selectedRole;
 
-    if (username.isNotEmpty && password.isNotEmpty) {
+    if (username.isNotEmpty &&
+        password.isNotEmpty &&
+        email.isNotEmpty &&
+        role.isNotEmpty) {
       try {
-        final data = await apiService.login(username, password);
-
-        // Debugging output
-        print('Login API response: $data');
-
-        // Check if the response data is not null and contains the 'role' property
-        // ignore: unnecessary_null_comparison
-        if (data != null && data.containsKey('role') && data['role'] != null) {
-          String role = data['role'];
-
-          if (role == "student") {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => StudentHomePage(),
-              ),
-            );
-          } else if (role == "faculty") {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FacultyHomePage(),
-              ),
-            );
-          } else if (role == "hod") {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HodHomePage(),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Invalid role.'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-          }
+        final success =
+            await apiService.register(username, password, email, role);
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Registration successful.'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          Navigator.pop(context); // Go back to login page
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Invalid response from server.'),
+              content: Text('Registration failed.'),
               duration: Duration(seconds: 2),
             ),
           );
         }
       } catch (e) {
-        // Enhanced error handling
-        print('Error during login: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
@@ -80,18 +57,11 @@ class LoginPage extends StatelessWidget {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please enter both username and password.'),
+          content: Text('Please fill in all fields.'),
           duration: Duration(seconds: 2),
         ),
       );
     }
-  }
-
-  void navigateToRegisterPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RegisterPage()),
-    );
   }
 
   @override
@@ -113,7 +83,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 50),
                 Text(
-                  'Welcome back, you\'ve been missed!',
+                  'Create a new account',
                   style: TextStyle(
                     color: Colors.grey[700],
                     fontSize: 16,
@@ -132,15 +102,38 @@ class LoginPage extends StatelessWidget {
                   hintText: 'Password',
                   obscureText: true,
                 ),
-                const SizedBox(height: 20),
-                MyButton(
-                  onTap: () => signUserIn(context),
-                  label: 'Sign In',
+                const SizedBox(height: 10),
+                MyTextField(
+                  controller: emailController,
+                  hintText: 'Email',
+                  obscureText: false,
+                ),
+                const SizedBox(height: 10),
+                // Dropdown for role selection
+                DropdownButtonFormField<String>(
+                  value: selectedRole,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedRole = newValue!;
+                    });
+                  },
+                  items: <String>['student', 'faculty', 'hod']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                    labelText: 'Role',
+                  ),
                 ),
                 const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () => navigateToRegisterPage(context),
-                  child: Text('Don\'t have an account? Register here'),
+                MyButton(
+                  onTap: () => registerUser(context),
+                  label: 'Register',
                 ),
                 const SizedBox(height: 50),
               ],
