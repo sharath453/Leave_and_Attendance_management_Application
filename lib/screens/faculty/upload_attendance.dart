@@ -39,47 +39,45 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
       appBar: AppBar(
         title: Text('Upload Attendance'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Select Subject',
-                  border: OutlineInputBorder(),
-                ),
-                value: selectedSubject,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSubject = newValue!;
-                  });
-                },
-                items: subjects.map<DropdownMenuItem<String>>((String subject) {
-                  return DropdownMenuItem<String>(
-                    value: subject,
-                    child: Text(subject),
-                  );
-                }).toList(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: 'Select Subject',
+                border: OutlineInputBorder(),
               ),
-              SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Total Classes Conducted',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  setState(() {
-                    totalClassesConducted = int.parse(value);
-                  });
-                },
+              value: selectedSubject,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedSubject = newValue!;
+                });
+              },
+              items: subjects.map<DropdownMenuItem<String>>((String subject) {
+                return DropdownMenuItem<String>(
+                  value: subject,
+                  child: Text(subject),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 16), // Added padding here
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Total Classes Conducted',
+                border: OutlineInputBorder(),
               ),
-              SizedBox(height: 20),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                setState(() {
+                  totalClassesConducted = int.parse(value);
+                });
+              },
+            ),
+            Expanded(
+              child: ListView.builder(
                 itemCount:
                     10, // Assuming 10 students, modify as per actual data
                 itemBuilder: (context, index) {
@@ -100,12 +98,12 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                   );
                 },
               ),
-              ElevatedButton(
-                onPressed: submitAttendance,
-                child: Text('Submit Attendance'),
-              ),
-            ],
-          ),
+            ),
+            ElevatedButton(
+              onPressed: submitAttendance,
+              child: Text('Submit Attendance'),
+            ),
+          ],
         ),
       ),
     );

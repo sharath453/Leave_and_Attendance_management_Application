@@ -68,44 +68,42 @@ class _AddNotesPageState extends State<AddNotesPage> {
       appBar: AppBar(
         title: Text('Upload Notes'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Select Subject',
-                  border: OutlineInputBorder(),
-                ),
-                value: selectedSubject,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSubject = newValue!;
-                  });
-                },
-                items: subjects.map<DropdownMenuItem<String>>((String subject) {
-                  return DropdownMenuItem<String>(
-                    value: subject,
-                    child: Text(subject),
-                  );
-                }).toList(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: 'Select Subject',
+                border: OutlineInputBorder(),
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: selectFile,
-                child: Text(selectedFile == null
-                    ? 'Select PDF File'
-                    : 'File Selected: ${selectedFile!.path.split('/').last}'),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: uploadNotes,
-                child: Text('Upload Notes'),
-              ),
-            ],
-          ),
+              value: selectedSubject,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedSubject = newValue!;
+                });
+              },
+              items: subjects.map<DropdownMenuItem<String>>((String subject) {
+                return DropdownMenuItem<String>(
+                  value: subject,
+                  child: Text(subject),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: selectFile,
+              child: Text(selectedFile == null
+                  ? 'Select PDF File'
+                  : 'File Selected: ${selectedFile!.path.split('/').last}'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: uploadNotes,
+              child: Text('Upload Notes'),
+            ),
+          ],
         ),
       ),
     );
