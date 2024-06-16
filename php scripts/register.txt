@@ -1,0 +1,51 @@
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require 'db_connect.php';
+
+// Retrieve the input data from the request
+$input = json_decode(file_get_contents('php://input'), true);
+$fullName = $input['full_name'];
+$username = $input['username'];
+$password = $input['password'];
+$email = $input['email'];
+$role = $input['role'];
+
+// Check if all fields are provided
+if (empty($fullName) || empty($username) || empty($password) || empty($email) || empty($role)) {
+    echo json_encode(['error' => 'All fields are required']);
+    exit();
+}
+
+// Validate email format
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo json_encode(['error' => 'Invalid email format']);
+    exit();
+}
+
+// Hash the password for security
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+// Prepare the SQL statement
+$query = "INSERT INTO users (full_name, username, password, email, role) VALUES (?, ?, ?, ?, ?)";
+$stmt = mysqli_prepare($conn, $query);
+
+if (!$stmt) {
+    echo json_encode(['error' => 'Failed to prepare statement: ' . mysqli_error($conn)]);
+    exit();
+}
+
+// Bind parameters and execute the statement
+mysqli_stmt_bind_param($stmt, 'sssss', $fullName, $username, $hashedPassword, $email, $role);
+
+if (mysqli_stmt_execute($stmt)) {
+    echo json_encode(['success' => 'User registered successfully']);
+} else {
+    echo json_encode(['error' => 'Failed to register user: ' . mysqli_stmt_error($stmt)]);
+}
+
+mysqli_stmt_close($stmt);
+mysqli_close($conn);
+?>

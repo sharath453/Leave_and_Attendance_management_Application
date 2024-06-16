@@ -11,6 +11,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController fullNameController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -18,18 +19,20 @@ class _RegisterPageState extends State<RegisterPage> {
   String selectedRole = 'student'; // Default selected role
 
   void registerUser(BuildContext context) async {
+    String fullName = fullNameController.text;
     String username = usernameController.text;
     String password = passwordController.text;
     String email = emailController.text;
     String role = selectedRole;
 
-    if (username.isNotEmpty &&
+    if (fullName.isNotEmpty &&
+        username.isNotEmpty &&
         password.isNotEmpty &&
         email.isNotEmpty &&
         role.isNotEmpty) {
       try {
-        final success =
-            await apiService.register(username, password, email, role);
+        final success = await apiService.register(
+            fullName, username, password, email, role);
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -91,6 +94,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 25),
+                MyTextField(
+                  controller: fullNameController,
+                  hintText: 'Full Name',
+                  obscureText: false,
+                ),
+                const SizedBox(height: 10),
                 MyTextField(
                   controller: usernameController,
                   hintText: 'Username',
