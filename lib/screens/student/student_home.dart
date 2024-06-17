@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'apply_leave.dart';
 import 'view_attendance.dart';
 import 'view_fines.dart';
+import 'view_notes.dart';
 
 class StudentHomePage extends StatelessWidget {
   @override
@@ -40,6 +41,15 @@ class StudentHomePage extends StatelessWidget {
                 );
               },
               child: Text('View Fines'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ViewNotesPage()),
+                );
+              },
+              child: Text('View Notes'),
             ),
           ],
         ),

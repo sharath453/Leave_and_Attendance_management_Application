@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:leave_management_app/services/api_service.dart';
 import 'package:leave_management_app/utils/constants.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ViewNotesPage extends StatefulWidget {
   @override
@@ -19,7 +19,9 @@ class _ViewNotesPageState extends State<ViewNotesPage> {
   }
 
   void fetchNotes() async {
-    List<dynamic> notes = await apiService.viewNotes();
+    // Replace studentId with the actual student ID
+    int studentId = 1;
+    List<dynamic> notes = await apiService.fetchNotes(studentId);
     setState(() {
       notesList = notes;
     });
