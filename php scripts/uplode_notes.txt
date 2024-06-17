@@ -1,0 +1,65 @@
+<?php
+header('Content-Type: application/json');
+
+$response = array();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_FILES['file']) && isset($_POST['faculty_id']) && isset($_POST['subject'])) {
+        $faculty_id = $_POST['faculty_id'];
+        $subject = $_POST['subject'];
+        $file = $_FILES['file'];
+
+        // Move the uploaded file to the desired directory
+        $upload_dir = 'uploads/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        $file_path = $upload_dir . basename($file['name']);
+        
+        if (move_uploaded_file($file['tmp_name'], $file_path)) {
+            // Insert the details into the database
+            // Note: Replace the database connection details with your own
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $dbname = "leave_management_db";
+            
+            // Create connection
+            $conn = new mysqli($servername, $username, $password, $dbname);
+            
+            // Check connection
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+            
+            // Prepare and bind the SQL statement
+            $stmt = $conn->prepare("INSERT INTO notes (faculty_id, subject, file_path) VALUES (?, ?, ?)");
+            $stmt->bind_param("iss", $faculty_id, $subject, $file_path);
+            
+            // Execute the SQL statement
+            if ($stmt->execute() === TRUE) {
+                $response['success'] = true;
+                $response['message'] = 'File uploaded successfully and stored in the database';
+            } else {
+                $response['success'] = false;
+                $response['message'] = 'Failed to insert into database: ' . $conn->error;
+            }
+            
+            // Close connection
+            $stmt->close();
+            $conn->close();
+        } else {
+            $response['success'] = false;
+            $response['message'] = 'Failed to move uploaded file';
+        }
+    } else {
+        $response['success'] = false;
+        $response['message'] = 'Invalid request';
+    }
+} else {
+    $response['success'] = false;
+    $response['message'] = 'Invalid request method';
+}
+
+echo json_encode($response);
+?>
