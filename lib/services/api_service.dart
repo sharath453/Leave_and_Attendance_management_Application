@@ -1,11 +1,43 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
-import 'package:path/path.dart';
 import '../utils/constants.dart';
 
 class ApiService {
   static const String baseUrl = Constants.baseUrl;
+
+  Future<void> uploadNotes(
+      int facultyId, String subject, String filePath) async {
+    try {
+      var request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/upload_notes.php'));
+      request.fields['faculty_id'] = facultyId.toString();
+      request.fields['subject'] = subject;
+      request.files.add(await http.MultipartFile.fromPath('file', filePath));
+
+      var response = await request.send();
+
+      // Read the response
+      var responseString = await response.stream.bytesToString();
+      print(
+          'Server response: $responseString'); // Print the server response for debugging
+
+      if (response.statusCode == 200) {
+        final decodedResponse = json.decode(responseString);
+        if (decodedResponse['success'] == true) {
+          return;
+        } else {
+          throw Exception(
+              'Failed to upload notes: ${decodedResponse['message']}');
+        }
+      } else {
+        throw Exception('Failed to upload notes: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to upload notes: $e');
+    }
+  }
+
+  // Other methods...
 
   Future<Map<String, dynamic>> login(String username, String password) async {
     try {
@@ -151,25 +183,6 @@ class ApiService {
     }
   }
 
-  Future<void> uploadNotes(
-      int facultyId, String subject, String filePath) async {
-    try {
-      var request =
-          http.MultipartRequest('POST', Uri.parse('$baseUrl/upload_notes.php'));
-      request.fields['faculty_id'] = facultyId.toString();
-      request.fields['subject'] = subject;
-      request.files.add(await http.MultipartFile.fromPath('file', filePath));
-
-      var response = await request.send();
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to upload notes: ${response.reasonPhrase}');
-      }
-    } catch (e) {
-      throw Exception('Failed to upload notes: $e');
-    }
-  }
-
   Future<List<dynamic>> fetchNotes(int studentId) async {
     try {
       final response = await http
@@ -181,6 +194,26 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Failed to fetch notes: $e');
+    }
+  }
+
+  Future<void> submitFine(int studentId, double fineAmount) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/submit_fine.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'student_id': studentId,
+          'fine_amount': fineAmount,
+        }),
+      );
+      if (response.statusCode != 200) {
+        throw Exception('Failed to submit fine: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to submit fine: $e');
     }
   }
 }
