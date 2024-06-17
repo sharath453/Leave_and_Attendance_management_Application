@@ -37,8 +37,6 @@ class ApiService {
     }
   }
 
-  // Other methods...
-
   Future<Map<String, dynamic>> login(String username, String password) async {
     try {
       final response = await http.post(
@@ -216,4 +214,6 @@ class ApiService {
       throw Exception('Failed to submit fine: $e');
     }
   }
+
+  viewNotes() {}
 }
