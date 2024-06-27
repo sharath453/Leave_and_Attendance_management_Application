@@ -93,6 +93,29 @@ class ApiService {
     }
   }
 
+  Future<void> applyLeave(
+      int studentId, String startDate, String endDate, String reason) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/apply_leave.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'student_id': studentId,
+          'start_date': startDate,
+          'end_date': endDate,
+          'reason': reason,
+        }),
+      );
+      if (response.statusCode != 200) {
+        throw Exception('Failed to apply for leave: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to apply for leave: $e');
+    }
+  }
+
   Future<List<dynamic>> fetchLeaveApplications(int hodId) async {
     try {
       final response = await http
@@ -158,29 +181,6 @@ class ApiService {
     }
   }
 
-  Future<void> applyLeave(
-      int studentId, String startDate, String endDate, String reason) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/apply_leave.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'student_id': studentId,
-          'start_date': startDate,
-          'end_date': endDate,
-          'reason': reason,
-        }),
-      );
-      if (response.statusCode != 200) {
-        throw Exception('Failed to apply for leave: ${response.reasonPhrase}');
-      }
-    } catch (e) {
-      throw Exception('Failed to apply for leave: $e');
-    }
-  }
-
   Future<List<dynamic>> fetchNotes(int studentId) async {
     try {
       final response = await http
@@ -215,5 +215,7 @@ class ApiService {
     }
   }
 
-  viewNotes() {}
+  viewNotes() {
+    // Implement viewNotes functionality if needed
+  }
 }

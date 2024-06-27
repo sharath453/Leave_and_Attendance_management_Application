@@ -1,0 +1,54 @@
+<?php
+header('Content-Type: application/json');
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "leave_management_db"; // Updated database name
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die(json_encode(['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+$input = json_decode(file_get_contents('php://input'), true);
+
+// Retrieve the student ID from input
+$student_id = $input['student_id'];
+
+// Retrieve the username corresponding to the student ID from the users table
+$stmt = $conn->prepare("SELECT username FROM users WHERE student_id = ?");
+$stmt->bind_param("i", $student_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+  // Fetch the username
+  $row = $result->fetch_assoc();
+  $username = $row['username'];
+
+  // Get other details from the input
+  $start_date = $input['start_date'];
+  $end_date = $input['end_date'];
+  $reason = $input['reason'];
+
+  // Insert into leave_applications table
+  $sql = "INSERT INTO leave_applications (username, start_date, end_date, reason) VALUES (?, ?, ?, ?)";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("ssss", $username, $start_date, $end_date, $reason);
+
+  if ($stmt->execute()) {
+    echo json_encode(['success' => true, 'message' => 'Leave applied successfully']);
+  } else {
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $stmt->error]);
+  }
+} else {
+  echo json_encode(['success' => false, 'message' => 'Student not found']);
+}
+
+$stmt->close();
+$conn->close();
+?>

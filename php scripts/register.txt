@@ -7,6 +7,12 @@ require 'db_connect.php';
 
 // Retrieve the input data from the request
 $input = json_decode(file_get_contents('php://input'), true);
+
+if (is_null($input)) {
+    echo json_encode(['error' => 'Invalid JSON input']);
+    exit();
+}
+
 $fullName = $input['full_name'];
 $username = $input['username'];
 $password = $input['password'];

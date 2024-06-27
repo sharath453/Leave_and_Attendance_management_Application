@@ -25,9 +25,7 @@ class LoginPage extends StatelessWidget {
         // Debugging output
         print('Login API response: $data');
 
-        // Check if the response data is not null and contains the 'role' property
-        // ignore: unnecessary_null_comparison
-        if (data != null && data.containsKey('role') && data['role'] != null) {
+        if (data.containsKey('role')) {
           String role = data['role'];
 
           if (role == "student") {
@@ -59,6 +57,13 @@ class LoginPage extends StatelessWidget {
               ),
             );
           }
+        } else if (data.containsKey('message')) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(data['message']),
+              duration: Duration(seconds: 2),
+            ),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
