@@ -102,7 +102,8 @@ class ApiService {
           'Content-Type': 'application/json',
         },
         body: jsonEncode(<String, dynamic>{
-          'student_id': studentId,
+          'usn':
+              '4AL21CS${studentId.toString().padLeft(3, '0')}', // Use the complete USN format
           'start_date': startDate,
           'end_date': endDate,
           'reason': reason,
@@ -215,7 +216,43 @@ class ApiService {
     }
   }
 
-  viewNotes() {
-    // Implement viewNotes functionality if needed
+  Future<void> markLeaveAsApproved(int leaveId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/mark_leave_as_approved.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'leave_id': leaveId,
+        }),
+      );
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Failed to mark leave as approved: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to mark leave as approved: $e');
+    }
+  }
+
+  Future<void> markLeaveAsRejected(int leaveId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/mark_leave_as_rejected.php'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'leave_id': leaveId,
+        }),
+      );
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Failed to mark leave as rejected: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to mark leave as rejected: $e');
+    }
   }
 }

@@ -14,30 +14,20 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
 
   final ApiService _apiService = ApiService(); // Instantiate your ApiService
 
-  bool _isApplyButtonEnabled = false;
+  bool _isButtonEnabled = false;
 
   @override
   void initState() {
     super.initState();
-
-    _usnController.addListener(_updateApplyButtonState);
-    _startDateController.addListener(_updateApplyButtonState);
-    _endDateController.addListener(_updateApplyButtonState);
-    _reasonController.addListener(_updateApplyButtonState);
+    _usnController.addListener(_validateForm);
+    _startDateController.addListener(_validateForm);
+    _endDateController.addListener(_validateForm);
+    _reasonController.addListener(_validateForm);
   }
 
-  @override
-  void dispose() {
-    _usnController.dispose();
-    _startDateController.dispose();
-    _endDateController.dispose();
-    _reasonController.dispose();
-    super.dispose();
-  }
-
-  void _updateApplyButtonState() {
+  void _validateForm() {
     setState(() {
-      _isApplyButtonEnabled = _usnController.text.isNotEmpty &&
+      _isButtonEnabled = _usnController.text.isNotEmpty &&
           _startDateController.text.isNotEmpty &&
           _endDateController.text.isNotEmpty &&
           _reasonController.text.isNotEmpty;
@@ -50,9 +40,31 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
     final String endDate = _endDateController.text;
     final String reason = _reasonController.text;
 
-    // Extract the numeric part from USN (e.g., '134' from '4AL21CS134')
+    // Regular expression to match the USN format
+    final RegExp usnRegExp = RegExp(r'^4AL21CS\d{3}$');
+
+    if (!usnRegExp.hasMatch(usn)) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Invalid USN format'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Extract the numeric part from USN (e.g., '001' from '4AL21CS001')
     final studentIdString =
-        usn.substring(7); // Extracts '134' from '4AL21CS134'
+        usn.substring(7); // Extracts '001' from '4AL21CS001'
     final studentId = int.tryParse(studentIdString);
 
     if (studentId == null) {
@@ -119,7 +131,7 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
       firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 1),
     );
-    if (picked != null) {
+    if (picked != null && picked != DateTime.now()) {
       setState(() {
         _startDateController.text = picked.toString().split(' ')[0];
       });
@@ -133,7 +145,7 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
       firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 1),
     );
-    if (picked != null) {
+    if (picked != null && picked != DateTime.now()) {
       setState(() {
         _endDateController.text = picked.toString().split(' ')[0];
       });
@@ -178,12 +190,21 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _isApplyButtonEnabled ? applyForLeave : null,
+              onPressed: _isButtonEnabled ? applyForLeave : null,
               child: Text('Apply'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _usnController.dispose();
+    _startDateController.dispose();
+    _endDateController.dispose();
+    _reasonController.dispose();
+    super.dispose();
   }
 }
