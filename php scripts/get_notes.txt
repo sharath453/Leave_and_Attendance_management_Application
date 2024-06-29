@@ -1,0 +1,26 @@
+<?php
+include 'db_connection.php';
+
+if (isset($_GET['student_id'])) {
+    $studentId = $_GET['student_id'];
+    $query = "SELECT notes.subject, notes.file_path, notes.uploaded_at 
+              FROM notes 
+              INNER JOIN student_subjects ON notes.subject_id = student_subjects.subject_id 
+              WHERE student_subjects.student_id = ?";
+
+    if ($stmt = $conn->prepare($query)) {
+        $stmt->bind_param("i", $studentId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $notes = array();
+        while ($row = $result->fetch_assoc()) {
+            $notes[] = $row;
+        }
+        echo json_encode($notes);
+    } else {
+        echo json_encode(array('success' => false, 'message' => 'Failed to prepare statement'));
+    }
+} else {
+    echo json_encode(array('success' => false, 'message' => 'Invalid request'));
+}
+?>
