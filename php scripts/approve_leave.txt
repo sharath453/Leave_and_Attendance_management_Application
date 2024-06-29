@@ -1,0 +1,30 @@
+<?php
+header('Content-Type: application/json');
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "leave_management_db"; // Updated database name
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die(json_encode(['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+$input = json_decode(file_get_contents('php://input'), true);
+
+$leave_id = $input['leave_id'];
+
+$sql = "UPDATE leave_applications SET status = 'Approved' WHERE id = '$leave_id'";
+
+if ($conn->query($sql) === TRUE) {
+  echo json_encode(['success' => true, 'message' => 'Leave approved successfully']);
+} else {
+  echo json_encode(['success' => false, 'message' => 'Error: ' . $sql . '<br>' . $conn->error]);
+}
+
+$conn->close();
+?>
