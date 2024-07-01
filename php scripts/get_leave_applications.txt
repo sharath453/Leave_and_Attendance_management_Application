@@ -1,0 +1,36 @@
+<?php
+header('Content-Type: application/json');
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "leave_management_db"; // Updated database name
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die(json_encode(['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+$hod_id = $_GET['hod_id'];
+
+$sql = "SELECT la.id, la.reason, la.start_date, la.end_date, s.username AS student_username
+        FROM leave_applications la
+        JOIN students s ON la.student_id = s.id
+        WHERE la.hod_id = '$hod_id'";
+
+$result = $conn->query($sql);
+
+$applications = [];
+if ($result->num_rows > 0) {
+  while($row = $result->fetch_assoc()) {
+    $applications[] = $row;
+  }
+}
+
+echo json_encode(['success' => true, 'applications' => $applications]);
+
+$conn->close();
+?>

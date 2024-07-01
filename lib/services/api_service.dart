@@ -117,12 +117,12 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> fetchLeaveApplications(int hodId) async {
+  Future<List<dynamic>> viewLeaveApplications(String usernamePrefix) async {
     try {
-      final response = await http
-          .get(Uri.parse('$baseUrl/get_leave_applications.php?hod_id=$hodId'));
+      final response = await http.get(Uri.parse(
+          '$baseUrl/get_leave_applications.php?username_prefix=$usernamePrefix'));
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return json.decode(response.body)['applications'];
       } else {
         throw Exception(
             'Failed to fetch leave applications: ${response.reasonPhrase}');
