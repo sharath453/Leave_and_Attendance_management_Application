@@ -85,7 +85,6 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Implement approve functionality
                                 int leaveId = leaveRequests[index]['leave_id'];
                                 approveLeave(leaveId);
                               },
@@ -93,7 +92,6 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                // Implement reject functionality
                                 int leaveId = leaveRequests[index]['leave_id'];
                                 rejectLeave(leaveId);
                               },
@@ -111,10 +109,25 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
   }
 
   void approveLeave(int leaveId) {
-    // Implement API call to mark leave as approved
     try {
-      _apiService.markLeaveAsApproved(leaveId);
-      // Optionally update UI or show success message
+      _apiService.markLeaveAsApproved(leaveId).then((value) {
+        // Update UI or show success message if needed
+        fetchLeaveRequests(); // Refresh the leave requests list
+      }).catchError((error) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to approve leave: $error'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      });
     } catch (e) {
       showDialog(
         context: context,
@@ -133,10 +146,25 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
   }
 
   void rejectLeave(int leaveId) {
-    // Implement API call to mark leave as rejected
     try {
-      _apiService.markLeaveAsRejected(leaveId);
-      // Optionally update UI or show success message
+      _apiService.markLeaveAsRejected(leaveId).then((value) {
+        // Update UI or show success message if needed
+        fetchLeaveRequests(); // Refresh the leave requests list
+      }).catchError((error) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to reject leave: $error'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      });
     } catch (e) {
       showDialog(
         context: context,
