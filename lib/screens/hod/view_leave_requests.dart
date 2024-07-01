@@ -51,13 +51,106 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
           : ListView.builder(
               itemCount: leaveRequests.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text('Leave Request ${index + 1}'),
-                  subtitle: Text('Reason: ${leaveRequests[index]['reason']}'),
-                  // Add more details as needed
+                return Card(
+                  margin: EdgeInsets.all(8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Username: ${leaveRequests[index]['username']}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Start Date: ${leaveRequests[index]['start_date']}',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          'End Date: ${leaveRequests[index]['end_date']}',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Reason: ${leaveRequests[index]['reason']}',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Implement approve functionality
+                                int leaveId = leaveRequests[index]['leave_id'];
+                                approveLeave(leaveId);
+                              },
+                              child: Text('Approve'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Implement reject functionality
+                                int leaveId = leaveRequests[index]['leave_id'];
+                                rejectLeave(leaveId);
+                              },
+                              child: Text('Reject'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               },
             ),
     );
+  }
+
+  void approveLeave(int leaveId) {
+    // Implement API call to mark leave as approved
+    try {
+      _apiService.markLeaveAsApproved(leaveId);
+      // Optionally update UI or show success message
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to approve leave: $e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void rejectLeave(int leaveId) {
+    // Implement API call to mark leave as rejected
+    try {
+      _apiService.markLeaveAsRejected(leaveId);
+      // Optionally update UI or show success message
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to reject leave: $e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
