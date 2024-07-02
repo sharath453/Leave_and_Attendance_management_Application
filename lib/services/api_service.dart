@@ -216,6 +216,21 @@ class ApiService {
     }
   }
 
+  Future<List<dynamic>> fetchApprovedLeaveApplications() async {
+    try {
+      final response = await http
+          .get(Uri.parse('$baseUrl/get_approved_leave_applications.php'));
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception(
+            'Failed to fetch approved leave applications: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch approved leave applications: $e');
+    }
+  }
+
   Future<void> markLeaveAsApproved(int leaveId) async {
     try {
       final response = await http.post(
