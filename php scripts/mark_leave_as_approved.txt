@@ -1,0 +1,55 @@
+<?php
+// Include database connection or configuration file
+
+// Establish database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "leave_management_db";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get the leave_id from the POST request
+$leaveId = $_POST['leave_id'];
+
+try {
+    // Update the leave request status in the 'leave_applications' table to 'Approved'
+    $sql_update_leave = "UPDATE leave_applications SET status = 'Approved' WHERE leave_id = $leaveId";
+
+    if ($conn->query($sql_update_leave) === TRUE) {
+        // Fetch details of the leave application
+        $sql_select_leave = "SELECT username, start_date, end_date, reason FROM leave_applications WHERE leave_id = $leaveId";
+        $result = $conn->query($sql_select_leave);
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+
+            // Insert into 'approved_leave_applications' table
+            $username = $row['username'];
+            $start_date = $row['start_date'];
+            $end_date = $row['end_date'];
+            $reason = $row['reason'];
+
+            $sql_insert_approved = "INSERT INTO approved_leave_applications (leave_id, username, start_date, end_date, reason)
+                                    VALUES ($leaveId, '$username', '$start_date', '$end_date', '$reason')";
+
+            if ($conn->query($sql_insert_approved) === TRUE) {
+                echo json_encode(array('success' => true, 'message' => 'Leave marked as approved successfully'));
+            } else {
+                echo json_encode(array('success' => false, 'message' => 'Error marking leave as approved: ' . $conn->error));
+            }
+        } else {
+            echo json_encode(array('success' => false, 'message' => 'Leave application details not found'));
+        }
+    } else {
+        echo json_encode(array('success' => false, 'message' => 'Error updating leave status: ' . $conn->error));
+    }
+} catch (Exception $e) {
+    echo json_encode(array('success' => false, 'message' => 'Exception: ' . $e->getMessage()));
+}
+
+$conn->close();
+?>

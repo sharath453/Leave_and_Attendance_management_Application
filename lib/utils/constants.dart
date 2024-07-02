@@ -1,3 +1,3 @@
 class Constants {
-  static const String baseUrl = 'http://192.188.166.15'; // Your API base URL
+  static const String baseUrl = 'http://192.168.49.245'; // Your API base URL
 }

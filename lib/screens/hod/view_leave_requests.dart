@@ -85,8 +85,9 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                int leaveId = leaveRequests[index]['leave_id'];
-                                approveLeave(leaveId);
+                                String username =
+                                    leaveRequests[index]['username'];
+                                approveLeave(username);
                               },
                               child: Text('Approve'),
                             ),
@@ -108,11 +109,14 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
     );
   }
 
-  void approveLeave(int leaveId) {
+  void approveLeave(String username) {
     try {
-      _apiService.markLeaveAsApproved(leaveId).then((value) {
-        // Update UI or show success message if needed
-        fetchLeaveRequests(); // Refresh the leave requests list
+      _apiService.markLeaveAsApproved(username).then((value) {
+        setState(() {
+          // Update UI or show success message if needed
+          fetchLeaveRequests(); // Refresh the leave requests list
+          showMessage('Leave Approved');
+        });
       }).catchError((error) {
         showDialog(
           context: context,
@@ -148,8 +152,11 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
   void rejectLeave(int leaveId) {
     try {
       _apiService.markLeaveAsRejected(leaveId).then((value) {
-        // Update UI or show success message if needed
-        fetchLeaveRequests(); // Refresh the leave requests list
+        setState(() {
+          // Update UI or show success message if needed
+          fetchLeaveRequests(); // Refresh the leave requests list
+          showMessage('Leave Rejected');
+        });
       }).catchError((error) {
         showDialog(
           context: context,
@@ -180,5 +187,14 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
         ),
       );
     }
+  }
+
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 }
