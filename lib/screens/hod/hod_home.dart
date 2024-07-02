@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:leave_management_app/screens/hod/view_leave_requests.dart';
 import 'package:leave_management_app/screens/hod/approved_leave_application.dart';
-import 'package:leave_management_app/screens/hod/view_attendance.dart'; // Import your new screen for viewing attendance
+import 'package:leave_management_app/screens/hod/view_attendance.dart';
+import 'package:leave_management_app/screens/hod/rejected_leave_application.dart'; // Import the RejectedLeaveApplicationPage
 
 class HodHomePage extends StatelessWidget {
   @override
@@ -46,6 +47,18 @@ class HodHomePage extends StatelessWidget {
                 );
               },
               child: Text('View Attendance'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        RejectedLeaveApplicationPage(), // Navigate to RejectedLeaveApplicationPage
+                  ),
+                );
+              },
+              child: Text('Rejected Leave Applications'),
             ),
           ],
         ),

@@ -85,17 +85,15 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                String username =
-                                    leaveRequests[index]['username'];
-                                approveLeave(username);
+                                int leaveId = leaveRequests[index]['leave_id'];
+                                approveLeave(leaveId);
                               },
                               child: Text('Approve'),
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                String username =
-                                    leaveRequests[index]['username'];
-                                rejectLeave(username); // Updated method call
+                                int leaveId = leaveRequests[index]['leave_id'];
+                                rejectLeave(leaveId);
                               },
                               child: Text('Reject'),
                             ),
@@ -110,58 +108,77 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
     );
   }
 
-  void approveLeave(String username) {
+  void approveLeave(int leaveId) {
     try {
-      _apiService.markLeaveAsApproved(username).then((_) {
-        setState(() {
-          fetchLeaveRequests(); // Refresh the leave requests list
-          showMessage('Leave Approved');
-        });
+      _apiService.markLeaveAsApproved(leaveId).then((value) {
+        // Update UI or show success message if needed
+        fetchLeaveRequests(); // Refresh the leave requests list
       }).catchError((error) {
-        showErrorDialog('Failed to approve leave: $error');
-      });
-    } catch (e) {
-      showErrorDialog('Failed to approve leave: $e');
-    }
-  }
-
-  void rejectLeave(String username) {
-    try {
-      _apiService.markLeaveAsRejected(username).then((_) {
-        setState(() {
-          fetchLeaveRequests(); // Refresh the leave requests list
-          showMessage('Leave Rejected');
-        });
-      }).catchError((error) {
-        showErrorDialog('Failed to reject leave: $error');
-      });
-    } catch (e) {
-      showErrorDialog('Failed to reject leave: $e');
-    }
-  }
-
-  void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: Duration(seconds: 2), // Display for 2 seconds
-      ),
-    );
-  }
-
-  void showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Error'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to approve leave: $error'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      });
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to approve leave: $e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void rejectLeave(int leaveId) {
+    try {
+      _apiService.markLeaveAsRejected(leaveId).then((value) {
+        // Update UI or show success message if needed
+        fetchLeaveRequests(); // Refresh the leave requests list
+      }).catchError((error) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to reject leave: $error'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      });
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to reject leave: $e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
