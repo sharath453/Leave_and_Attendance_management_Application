@@ -236,7 +236,7 @@ class ApiService {
     }
   }
 
-  Future<void> markLeaveAsRejected(int leaveId) async {
+  Future<void> markLeaveAsRejected(String username) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/mark_leave_as_rejected.php'),
@@ -244,7 +244,7 @@ class ApiService {
           'Content-Type': 'application/json',
         },
         body: jsonEncode(<String, dynamic>{
-          'leave_id': leaveId,
+          'username': username,
         }),
       );
       if (response.statusCode != 200) {

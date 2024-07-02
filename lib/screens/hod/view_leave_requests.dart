@@ -93,8 +93,9 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                int leaveId = leaveRequests[index]['leave_id'];
-                                rejectLeave(leaveId);
+                                String username =
+                                    leaveRequests[index]['username'];
+                                rejectLeave(username); // Updated method call
                               },
                               child: Text('Reject'),
                             ),
@@ -111,81 +112,31 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
 
   void approveLeave(String username) {
     try {
-      _apiService.markLeaveAsApproved(username).then((value) {
+      _apiService.markLeaveAsApproved(username).then((_) {
         setState(() {
-          // Update UI or show success message if needed
           fetchLeaveRequests(); // Refresh the leave requests list
           showMessage('Leave Approved');
         });
       }).catchError((error) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Error'),
-            content: Text('Failed to approve leave: $error'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
+        showErrorDialog('Failed to approve leave: $error');
       });
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text('Failed to approve leave: $e'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+      showErrorDialog('Failed to approve leave: $e');
     }
   }
 
-  void rejectLeave(int leaveId) {
+  void rejectLeave(String username) {
     try {
-      _apiService.markLeaveAsRejected(leaveId).then((value) {
+      _apiService.markLeaveAsRejected(username).then((_) {
         setState(() {
-          // Update UI or show success message if needed
           fetchLeaveRequests(); // Refresh the leave requests list
           showMessage('Leave Rejected');
         });
       }).catchError((error) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Error'),
-            content: Text('Failed to reject leave: $error'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
+        showErrorDialog('Failed to reject leave: $error');
       });
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text('Failed to reject leave: $e'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+      showErrorDialog('Failed to reject leave: $e');
     }
   }
 
@@ -193,7 +144,23 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 2), // Display for 2 seconds
+      ),
+    );
+  }
+
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
       ),
     );
   }

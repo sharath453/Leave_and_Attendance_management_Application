@@ -1,0 +1,59 @@
+<?php
+header('Content-Type: application/json');
+
+// Database connection details
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "leave_management_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode(['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+// Get JSON input and decode it
+$input = json_decode(file_get_contents('php://input'), true);
+
+// Retrieve username from input
+$username = $input['username'];
+
+try {
+    // Update the leave request status in the 'leave_applications' table to 'Rejected'
+    $sql_update_leave = "UPDATE leave_applications SET status = 'Rejected' WHERE username = ?";
+    $stmt_update = $conn->prepare($sql_update_leave);
+    $stmt_update->bind_param("s", $username);
+
+    if ($stmt_update->execute()) {
+        // Fetch the details of the rejected leave application
+        $sql_select_leave = "SELECT * FROM leave_applications WHERE username = ?";
+        $stmt_select = $conn->prepare($sql_select_leave);
+        $stmt_select->bind_param("s", $username);
+        $stmt_select->execute();
+        $result = $stmt_select->get_result();
+        $leaveApplication = $result->fetch_assoc();
+
+        // Insert the details into rejected_leave_applications table
+        $sql_insert_rejected = "INSERT INTO rejected_leave_applications (username, start_date, end_date, reason, rejected_at) VALUES (?, ?, ?, ?, NOW())";
+        $stmt_insert_rejected = $conn->prepare($sql_insert_rejected);
+        $stmt_insert_rejected->bind_param("ssss", $leaveApplication['username'], $leaveApplication['start_date'], $leaveApplication['end_date'], $leaveApplication['reason']);
+        $stmt_insert_rejected->execute();
+
+        if ($stmt_insert_rejected->affected_rows > 0) {
+            echo json_encode(['success' => true, 'message' => 'Leave application rejected and stored in rejected_leave_applications table successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to store in rejected_leave_applications table.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error updating leave status: ' . $stmt_update->error]);
+    }
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => 'Exception: ' . $e->getMessage()]);
+}
+
+$stmt_update->close();
+$conn->close();
+?>
