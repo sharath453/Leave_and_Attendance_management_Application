@@ -15,11 +15,8 @@ class ApiService {
       request.files.add(await http.MultipartFile.fromPath('file', filePath));
 
       var response = await request.send();
-
-      // Read the response
       var responseString = await response.stream.bytesToString();
-      print(
-          'Server response: $responseString'); // Print the server response for debugging
+      print('Server response: $responseString');
 
       if (response.statusCode == 200) {
         final decodedResponse = json.decode(responseString);
@@ -41,13 +38,9 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/login.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(<String, String>{
-          'username': username,
-          'password': password,
-        }),
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode(
+            <String, String>{'username': username, 'password': password}),
       );
       if (response.statusCode == 200) {
         return json.decode(response.body);
@@ -64,15 +57,13 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/register.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
+        headers: <String, String>{'Content-Type': 'application/json'},
         body: jsonEncode(<String, String>{
           'full_name': fullName,
           'username': username,
           'password': password,
           'email': email,
-          'role': role,
+          'role': role
         }),
       );
       if (response.statusCode == 200) {
@@ -98,15 +89,12 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/apply_leave.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
+        headers: <String, String>{'Content-Type': 'application/json'},
         body: jsonEncode(<String, dynamic>{
-          'usn':
-              '4AL21CS${studentId.toString().padLeft(3, '0')}', // Use the complete USN format
+          'usn': '4AL21CS${studentId.toString().padLeft(3, '0')}',
           'start_date': startDate,
           'end_date': endDate,
-          'reason': reason,
+          'reason': reason
         }),
       );
       if (response.statusCode != 200) {
@@ -160,17 +148,18 @@ class ApiService {
   }
 
   Future<void> uploadAttendance(
-      int studentId, String subject, double attendancePercentage) async {
+      String username, String subject, double attendancePercentage) async {
     try {
+      final studentId = int.parse(
+          username.substring(7)); // Assuming username format '4AL21CS134'
+
       final response = await http.post(
         Uri.parse('$baseUrl/upload_attendance.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
+        headers: <String, String>{'Content-Type': 'application/json'},
         body: jsonEncode(<String, dynamic>{
           'student_id': studentId,
           'subject': subject,
-          'attendance_percentage': attendancePercentage,
+          'attendance_percentage': attendancePercentage
         }),
       );
       if (response.statusCode != 200) {
@@ -200,12 +189,10 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/submit_fine.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
+        headers: <String, String>{'Content-Type': 'application/json'},
         body: jsonEncode(<String, dynamic>{
           'student_id': studentId,
-          'fine_amount': fineAmount,
+          'fine_amount': fineAmount
         }),
       );
       if (response.statusCode != 200) {
@@ -246,16 +233,25 @@ class ApiService {
     }
   }
 
+  Future<List<String>> fetchUsernames() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/get_students.php'));
+      if (response.statusCode == 200) {
+        return List<String>.from(json.decode(response.body));
+      } else {
+        throw Exception('Failed to fetch usernames: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch usernames: $e');
+    }
+  }
+
   Future<void> markLeaveAsApproved(int leaveId) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/mark_leave_as_approved.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'leave_id': leaveId,
-        }),
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode(<String, dynamic>{'leave_id': leaveId}),
       );
       if (response.statusCode != 200) {
         throw Exception(
@@ -270,12 +266,8 @@ class ApiService {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/mark_leave_as_rejected.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'leave_id': leaveId,
-        }),
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode(<String, dynamic>{'leave_id': leaveId}),
       );
       if (response.statusCode != 200) {
         throw Exception(

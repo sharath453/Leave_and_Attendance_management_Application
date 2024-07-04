@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/api_service.dart';
+import 'package:leave_management_app/services/api_service.dart';
 
 class UploadAttendancePage extends StatefulWidget {
   @override
@@ -10,27 +10,45 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
   final ApiService apiService = ApiService();
   String? selectedSubject;
   int totalClassesConducted = 0;
-  Map<int, int> attendedClasses = {};
-  final List<String> subjects = [
-    'Full Stack Development (Python Django)',
-    'Software Engineering and Project Management',
-    'Full Stack Development (Python Django) Laboratory',
-    'Computer Graphics',
-    'Advanced Java Programming',
-    'Computer Graphics Laboratory',
-    'Soft Skills',
-    'Mini Project Laboratory',
-  ];
+  Map<String, int> attendanceMap = {};
+  List<String> usernames = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUsernames();
+  }
+
+  Future<void> fetchUsernames() async {
+    try {
+      List<String> fetchedUsernames = await apiService.fetchUsernames();
+      setState(() {
+        usernames = fetchedUsernames;
+      });
+    } catch (e) {
+      print('Error fetching usernames: $e');
+    }
+  }
 
   void submitAttendance() async {
-    attendedClasses.forEach((studentId, attended) async {
-      double attendancePercentage = (attended / totalClassesConducted) * 100;
-      await apiService.uploadAttendance(
-          studentId, selectedSubject!, attendancePercentage);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Attendance submitted successfully')),
-    );
+    try {
+      for (int i = 0; i < usernames.length; i++) {
+        String username = usernames[i];
+        int attendedClasses = attendanceMap[username] ?? 0;
+        double attendancePercentage =
+            (attendedClasses / totalClassesConducted) * 100;
+        await apiService.uploadAttendance(
+            username, selectedSubject!, attendancePercentage);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Attendance submitted successfully')),
+      );
+    } catch (e) {
+      print('Error uploading attendance: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to submit attendance')),
+      );
+    }
   }
 
   @override
@@ -56,14 +74,23 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                   selectedSubject = newValue!;
                 });
               },
-              items: subjects.map<DropdownMenuItem<String>>((String subject) {
+              items: [
+                'Full Stack Development (Python Django)',
+                'Software Engineering and Project Management',
+                'Full Stack Development (Python Django) Laboratory',
+                'Computer Graphics',
+                'Advanced Java Programming',
+                'Computer Graphics Laboratory',
+                'Soft Skills',
+                'Mini Project Laboratory',
+              ].map<DropdownMenuItem<String>>((String subject) {
                 return DropdownMenuItem<String>(
                   value: subject,
                   child: Text(subject),
                 );
               }).toList(),
             ),
-            SizedBox(height: 16), // Added padding here
+            SizedBox(height: 16),
             TextField(
               decoration: InputDecoration(
                 labelText: 'Total Classes Conducted',
@@ -78,11 +105,11 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount:
-                    10, // Assuming 10 students, modify as per actual data
+                itemCount: usernames.length,
                 itemBuilder: (context, index) {
+                  String username = usernames[index];
                   return ListTile(
-                    title: Text('Student $index'),
+                    title: Text(username),
                     subtitle: TextField(
                       decoration: InputDecoration(
                         labelText: 'Classes Attended',
@@ -91,7 +118,7 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         setState(() {
-                          attendedClasses[index] = int.parse(value);
+                          attendanceMap[username] = int.parse(value);
                         });
                       },
                     ),
