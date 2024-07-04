@@ -12,6 +12,7 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
   int totalClassesConducted = 0;
   Map<String, int> attendanceMap = {};
   List<String> usernames = [];
+  TextEditingController newStudentController = TextEditingController();
 
   @override
   void initState() {
@@ -48,6 +49,18 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to submit attendance')),
       );
+    }
+  }
+
+  void addNewStudent() {
+    String newStudentUsername = newStudentController.text.trim();
+    if (newStudentUsername.isNotEmpty &&
+        !usernames.contains(newStudentUsername)) {
+      setState(() {
+        usernames.add(newStudentUsername);
+        attendanceMap[newStudentUsername] = 0; // Initialize attendance count
+      });
+      newStudentController.clear(); // Clear the text field after adding
     }
   }
 
@@ -102,6 +115,25 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                   totalClassesConducted = int.parse(value);
                 });
               },
+            ),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: newStudentController,
+                    decoration: InputDecoration(
+                      labelText: 'New Student Username',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16),
+                TextButton(
+                  onPressed: addNewStudent,
+                  child: Text('Add Student'),
+                ),
+              ],
             ),
             Expanded(
               child: ListView.builder(
