@@ -28,11 +28,29 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
       });
     } catch (e) {
       print('Error fetching usernames: $e');
+      // Handle error gracefully, e.g., show a dialog to the user
     }
   }
 
   void submitAttendance() async {
     try {
+      if (selectedSubject == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please select a subject')),
+        );
+        return;
+      }
+
+      // Validate totalClassesConducted
+      if (totalClassesConducted <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text('Total classes conducted should be greater than zero')),
+        );
+        return;
+      }
+
       for (int i = 0; i < usernames.length; i++) {
         String username = usernames[i];
         int attendedClasses = attendanceMap[username] ?? 0;
@@ -52,15 +70,30 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     }
   }
 
-  void addNewStudent() {
+  void addNewStudent() async {
     String newStudentUsername = newStudentController.text.trim();
     if (newStudentUsername.isNotEmpty &&
         !usernames.contains(newStudentUsername)) {
-      setState(() {
-        usernames.add(newStudentUsername);
-        attendanceMap[newStudentUsername] = 0; // Initialize attendance count
-      });
-      newStudentController.clear(); // Clear the text field after adding
+      try {
+        await apiService.addStudent(newStudentUsername);
+        setState(() {
+          usernames.add(newStudentUsername);
+          attendanceMap[newStudentUsername] = 0; // Initialize attendance count
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Student added successfully')),
+        );
+        newStudentController.clear(); // Clear the text field after adding
+      } catch (e) {
+        print('Error adding student: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add student')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Student username already exists or is empty')),
+      );
     }
   }
 
@@ -112,7 +145,7 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
               keyboardType: TextInputType.number,
               onChanged: (value) {
                 setState(() {
-                  totalClassesConducted = int.parse(value);
+                  totalClassesConducted = int.tryParse(value) ?? 0;
                 });
               },
             ),
@@ -150,7 +183,7 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         setState(() {
-                          attendanceMap[username] = int.parse(value);
+                          attendanceMap[username] = int.tryParse(value) ?? 0;
                         });
                       },
                     ),
