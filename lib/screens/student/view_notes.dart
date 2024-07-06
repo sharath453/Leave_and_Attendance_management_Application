@@ -4,6 +4,8 @@ import 'package:leave_management_app/services/api_service.dart';
 import 'package:leave_management_app/utils/constants.dart';
 
 class ViewNotesPage extends StatefulWidget {
+  const ViewNotesPage({super.key});
+
   @override
   _ViewNotesPageState createState() => _ViewNotesPageState();
 }

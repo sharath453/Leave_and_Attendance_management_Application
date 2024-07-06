@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class FineCard extends StatelessWidget {
   final Map<String, dynamic> fine;
 
-  FineCard({required this.fine});
+  const FineCard({super.key, required this.fine});
 
   @override
   Widget build(BuildContext context) {

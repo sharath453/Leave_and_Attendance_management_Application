@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
 
 class AddNotesPage extends StatefulWidget {
+  const AddNotesPage({super.key});
+
   @override
   _AddNotesPageState createState() => _AddNotesPageState();
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:leave_management_app/services/api_service.dart';
 
 class ApprovedLeaveApplicationPage extends StatefulWidget {
+  const ApprovedLeaveApplicationPage({super.key});
+
   @override
   _ApprovedLeaveApplicationPageState createState() =>
       _ApprovedLeaveApplicationPageState();

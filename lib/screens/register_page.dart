@@ -4,7 +4,7 @@ import 'package:leave_management_app/widgets/my_button.dart';
 import 'package:leave_management_app/widgets/my_text_field.dart';
 
 class RegisterPage extends StatefulWidget {
-  RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();

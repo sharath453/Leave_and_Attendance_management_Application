@@ -5,6 +5,8 @@ import 'view_fines.dart';
 import 'view_notes.dart';
 
 class StudentHomePage extends StatelessWidget {
+  const StudentHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

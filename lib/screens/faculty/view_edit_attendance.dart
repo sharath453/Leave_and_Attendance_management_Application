@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
 
 class ViewEditAttendancePage extends StatefulWidget {
+  const ViewEditAttendancePage({super.key});
+
   @override
   _ViewEditAttendancePageState createState() => _ViewEditAttendancePageState();
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:leave_management_app/services/api_service.dart';
 
 class ViewLeaveRequestsPage extends StatefulWidget {
+  const ViewLeaveRequestsPage({super.key});
+
   @override
   _ViewLeaveRequestsPageState createState() => _ViewLeaveRequestsPageState();
 }

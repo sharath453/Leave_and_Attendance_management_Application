@@ -5,6 +5,8 @@ import 'package:leave_management_app/screens/hod/view_attendance.dart';
 import 'package:leave_management_app/screens/hod/rejected_leave_application.dart'; // Import the RejectedLeaveApplicationPage
 
 class HodHomePage extends StatelessWidget {
+  const HodHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

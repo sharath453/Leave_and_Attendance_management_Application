@@ -8,7 +8,7 @@ import 'package:leave_management_app/widgets/my_button.dart';
 import 'package:leave_management_app/widgets/my_text_field.dart';
 
 class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
+  LoginPage({super.key});
 
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();

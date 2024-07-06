@@ -5,6 +5,8 @@ import '../../widgets/fine_card.dart';
 class ViewFinesPage extends StatelessWidget {
   final ApiService apiService = ApiService();
 
+  ViewFinesPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

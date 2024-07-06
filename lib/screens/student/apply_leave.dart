@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:leave_management_app/services/api_service.dart'; // Replace with your actual import path
 
 class ApplyLeavePage extends StatefulWidget {
+  const ApplyLeavePage({super.key});
+
   @override
   _ApplyLeavePageState createState() => _ApplyLeavePageState();
 }

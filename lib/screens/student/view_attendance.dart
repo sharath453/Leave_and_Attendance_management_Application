@@ -5,6 +5,8 @@ import '../../widgets/attendance_card.dart';
 class ViewAttendancePage extends StatelessWidget {
   final ApiService apiService = ApiService();
 
+  ViewAttendancePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

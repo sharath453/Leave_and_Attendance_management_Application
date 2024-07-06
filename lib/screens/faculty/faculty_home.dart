@@ -4,6 +4,8 @@ import 'upload_attendance.dart';
 import 'view_edit_attendance.dart';
 
 class FacultyHomePage extends StatelessWidget {
+  const FacultyHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -12,7 +14,7 @@ class FacultyHomePage extends StatelessWidget {
         appBar: AppBar(
           title: Text('Faculty Home'),
           bottom: TabBar(
-            tabs: [
+            tabs: const [
               Tab(text: 'Upload Notes'),
               Tab(text: 'Upload Attendance'),
               Tab(text: 'View/Edit Attendance'),
@@ -20,7 +22,7 @@ class FacultyHomePage extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          children: [
+          children: const [
             AddNotesPage(),
             UploadAttendancePage(),
             ViewEditAttendancePage(),
