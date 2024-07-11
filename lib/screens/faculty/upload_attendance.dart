@@ -14,7 +14,6 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
   int totalClassesConducted = 0;
   Map<String, int> attendanceMap = {};
   List<String> usernames = [];
-  TextEditingController newStudentController = TextEditingController();
 
   @override
   void initState() {
@@ -22,6 +21,7 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     fetchUsernames();
   }
 
+  // Fetch usernames from the database
   Future<void> fetchUsernames() async {
     try {
       List<String> fetchedUsernames = await apiService.fetchUsernames();
@@ -34,6 +34,7 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     }
   }
 
+  // Submit attendance to the server
   void submitAttendance() async {
     try {
       if (selectedSubject == null) {
@@ -68,33 +69,6 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
       print('Error uploading attendance: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to submit attendance')),
-      );
-    }
-  }
-
-  void addNewStudent() async {
-    String newStudentUsername = newStudentController.text.trim();
-    if (newStudentUsername.isNotEmpty &&
-        !usernames.contains(newStudentUsername)) {
-      try {
-        await apiService.addStudent(newStudentUsername);
-        setState(() {
-          usernames.add(newStudentUsername);
-          attendanceMap[newStudentUsername] = 0; // Initialize attendance count
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Student added successfully')),
-        );
-        newStudentController.clear(); // Clear the text field after adding
-      } catch (e) {
-        print('Error adding student: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add student')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Student username already exists or is empty')),
       );
     }
   }
@@ -152,24 +126,6 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
               },
             ),
             SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: newStudentController,
-                    decoration: InputDecoration(
-                      labelText: 'New Student Username',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                TextButton(
-                  onPressed: addNewStudent,
-                  child: Text('Add Student'),
-                ),
-              ],
-            ),
             Expanded(
               child: ListView.builder(
                 itemCount: usernames.length,
