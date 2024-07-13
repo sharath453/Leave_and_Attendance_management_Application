@@ -3,7 +3,12 @@ import 'package:leave_management_app/screens/hod/view_leave_requests.dart';
 import 'package:leave_management_app/screens/hod/approved_leave_application.dart';
 import 'package:leave_management_app/screens/hod/view_attendance.dart';
 import 'package:leave_management_app/screens/hod/rejected_leave_application.dart';
-import 'package:leave_management_app/screens/hod/add_fine.dart'; // Import the AddFinePage
+import 'package:leave_management_app/screens/hod/add_fine.dart';
+import 'package:leave_management_app/screens/hod/view_fines.dart'
+    as hod; // Aliasing for HOD view
+// ignore: unused_import
+import 'package:leave_management_app/screens/student/view_fines.dart'
+    as student; // Aliasing for Student view
 
 class HodHomePage extends StatelessWidget {
   const HodHomePage({super.key});
@@ -67,12 +72,23 @@ class HodHomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        AddFinePage(), // Navigate to AddFinePage
+                    builder: (context) => AddFinePage(),
                   ),
                 );
               },
               child: Text('Add Fine'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        hod.ViewFinesPage(), // Using alias for HOD view
+                  ),
+                );
+              },
+              child: Text('View Fines'),
             ),
           ],
         ),

@@ -158,6 +158,16 @@ class ApiService {
     }
   }
 
+  Future<List<dynamic>> retrieveFines() async {
+    final response = await http.get(Uri.parse('$baseUrl/get_fines.php'));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load fines');
+    }
+  }
+
   Future<void> uploadAttendance(
       String selectedSubject, Map<String, double> attendanceData) async {
     String apiUrl = '$baseUrl/upload_attendance.php';
