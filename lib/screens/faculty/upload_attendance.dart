@@ -9,36 +9,21 @@ class UploadAttendancePage extends StatefulWidget {
 }
 
 class _UploadAttendancePageState extends State<UploadAttendancePage> {
-  final Map<String, String> subjectColumnMap = {
-    'Full Stack Development (Python Django)': 'full_stack_python_django',
-    'Software Engineering and Project Management':
-        'software_engineering_project_management',
-    'Full Stack Development (Python Django) Laboratory':
-        'full_stack_python_django_lab',
-    'Computer Graphics': 'computer_graphics',
-    'Advanced Java Programming': 'advanced_java_programming',
-    'Computer Graphics Laboratory': 'computer_graphics_lab',
-    'Soft Skills': 'soft_skills',
-    'Mini Project Laboratory': 'mini_project_lab',
-  };
+  final List<String> columns = [
+    'Full Stack Development (Python Django)',
+    'Software Engineering and Project Management',
+    'Full Stack Development (Python Django) Laboratory',
+    'Computer Graphics',
+    'Advanced Java Programming',
+    'Computer Graphics Laboratory',
+    'Soft Skills',
+    'Mini Project Laboratory',
+  ];
 
-  List<String> columns;
   String? selectedColumn;
   List<String> usernames = [];
   Map<String, TextEditingController> controllers = {};
-  TextEditingController newUsernameController = TextEditingController();
-
-  _UploadAttendancePageState()
-      : columns = [
-          'Full Stack Development (Python Django)',
-          'Software Engineering and Project Management',
-          'Full Stack Development (Python Django) Laboratory',
-          'Computer Graphics',
-          'Advanced Java Programming',
-          'Computer Graphics Laboratory',
-          'Soft Skills',
-          'Mini Project Laboratory',
-        ];
+  final TextEditingController newStudentController = TextEditingController();
 
   @override
   void initState() {
@@ -62,6 +47,32 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     }
   }
 
+  void addStudent() async {
+    String newStudentUsername = newStudentController.text.trim();
+    if (newStudentUsername.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a valid username')),
+      );
+      return;
+    }
+
+    try {
+      await ApiService().addStudent(newStudentUsername);
+      setState(() {
+        usernames.add(newStudentUsername);
+        controllers[newStudentUsername] = TextEditingController();
+        newStudentController.clear();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Student added successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add student: $e')),
+      );
+    }
+  }
+
   void submitAttendance() async {
     if (selectedColumn == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -77,12 +88,7 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     }
 
     try {
-      String? mappedColumn = subjectColumnMap[selectedColumn];
-      if (mappedColumn == null) {
-        throw Exception('Selected subject not mapped to a column');
-      }
-
-      await ApiService().uploadAttendance(mappedColumn, attendanceData);
+      await ApiService().uploadAttendance(selectedColumn!, attendanceData);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Attendance uploaded successfully')),
       );
@@ -93,40 +99,16 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     }
   }
 
-  void addNewStudent() async {
-    String newUsername = newUsernameController.text.trim();
-    if (newUsername.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter a username')),
-      );
-      return;
-    }
-
-    try {
-      await ApiService().addStudent(newUsername);
-      newUsernameController.clear();
-      fetchUsernames();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Student added successfully')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add student: $e')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Upload Attendance'),
-        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DropdownButton<String>(
               hint: Text('Select Subject'),
@@ -157,7 +139,6 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                         Expanded(
                           child: Text(
                             username,
-                            style: TextStyle(fontSize: 16),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -169,8 +150,6 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                             decoration: InputDecoration(
                               labelText: 'Attendance %',
                               border: OutlineInputBorder(),
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 10),
                             ),
                           ),
                         ),
@@ -180,19 +159,20 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                 },
               ),
             ),
+            SizedBox(height: 16),
             TextField(
-              controller: newUsernameController,
+              controller: newStudentController,
               decoration: InputDecoration(
-                labelText: 'Enter new student USN',
+                labelText: 'Add New Student',
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: addNewStudent,
+                  onPressed: addStudent,
                   child: Text('Add Student'),
                 ),
                 ElevatedButton(
