@@ -1,0 +1,35 @@
+<?php
+header('Content-Type: application/json');
+$servername = "localhost"; 
+$username = "root"; 
+$password = ""; 
+$dbname = "leave_management_db"; 
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die(json_encode(['error' => 'Database connection failed']));
+}
+
+$sql = "SELECT username, full_stack_python_django, software_engineering_project_management, full_stack_python_django_lab, computer_graphics, advanced_java_programming, computer_graphics_lab, soft_skills, mini_project_lab FROM attendance";
+$result = $conn->query($sql);
+
+$attendanceData = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $attendanceData[$row['username']] = [
+            'Full Stack Development (Python Django)' => (float)$row['full_stack_python_django'],
+            'Software Engineering and Project Management' => (float)$row['software_engineering_project_management'],
+            'Full Stack Development (Python Django) Laboratory' => (float)$row['full_stack_python_django_lab'],
+            'Computer Graphics' => (float)$row['computer_graphics'],
+            'Advanced Java Programming' => (float)$row['advanced_java_programming'],
+            'Computer Graphics Laboratory' => (float)$row['computer_graphics_lab'],
+            'Soft Skills' => (float)$row['soft_skills'],
+            'Mini Project Laboratory' => (float)$row['mini_project_lab']
+        ];
+    }
+}
+
+echo json_encode($attendanceData);
+$conn->close();
+?>
