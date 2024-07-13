@@ -103,9 +103,9 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     }
 
     try {
-      await ApiService().addStudent(newUsername); // New method to be created
+      await ApiService().addStudent(newUsername);
       newUsernameController.clear();
-      fetchUsernames(); // Refresh the list of usernames
+      fetchUsernames();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Student added successfully')),
       );
@@ -121,11 +121,12 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Upload Attendance'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             DropdownButton<String>(
               hint: Text('Select Subject'),
@@ -156,6 +157,7 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                         Expanded(
                           child: Text(
                             username,
+                            style: TextStyle(fontSize: 16),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -167,6 +169,8 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                             decoration: InputDecoration(
                               labelText: 'Attendance %',
                               border: OutlineInputBorder(),
+                              contentPadding:
+                                  EdgeInsets.symmetric(vertical: 10),
                             ),
                           ),
                         ),
@@ -179,17 +183,23 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
             TextField(
               controller: newUsernameController,
               decoration: InputDecoration(
-                labelText: 'Enter new student username',
+                labelText: 'Enter new student USN',
                 border: OutlineInputBorder(),
               ),
             ),
-            ElevatedButton(
-              onPressed: addNewStudent,
-              child: Text('Add Student'),
-            ),
-            ElevatedButton(
-              onPressed: submitAttendance,
-              child: Text('Submit'),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: addNewStudent,
+                  child: Text('Add Student'),
+                ),
+                ElevatedButton(
+                  onPressed: submitAttendance,
+                  child: Text('Submit Attendance'),
+                ),
+              ],
             ),
           ],
         ),
