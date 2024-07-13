@@ -1,0 +1,29 @@
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "leave_management_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
+}
+
+$sql = "SELECT username FROM attendance";
+$result = $conn->query($sql);
+
+if (!$result) {
+    die(json_encode(["error" => "Query failed: " . $conn->error]));
+}
+
+$usernames = [];
+while ($row = $result->fetch_assoc()) {
+    $usernames[] = $row['username'];
+}
+
+$conn->close();
+echo json_encode($usernames);
+?>
