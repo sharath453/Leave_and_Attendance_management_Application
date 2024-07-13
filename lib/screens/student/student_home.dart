@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'apply_leave.dart';
-import 'view_attendance.dart'; // Updated import
+import 'view_attendance.dart';
 import 'view_fines.dart';
 import 'view_notes.dart';
+import 'make_payments.dart'; // Import the new file
 
 class StudentHomePage extends StatelessWidget {
   const StudentHomePage({super.key});
@@ -31,8 +32,7 @@ class StudentHomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          ViewEditAttendancePage()), // Updated to use ViewEditAttendancePage
+                      builder: (context) => ViewEditAttendancePage()),
                 );
               },
               child: Text('View Attendance'),
@@ -54,6 +54,17 @@ class StudentHomePage extends StatelessWidget {
                 );
               },
               child: Text('View Notes'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MakePaymentsPage()), // Navigate to MakePaymentsPage
+                );
+              },
+              child: Text('Make Payments'),
             ),
           ],
         ),

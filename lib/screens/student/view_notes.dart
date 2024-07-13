@@ -21,12 +21,17 @@ class _ViewNotesPageState extends State<ViewNotesPage> {
   }
 
   void fetchNotes() async {
-    // Replace studentId with the actual student ID
-    int studentId = 1;
-    List<dynamic> notes = await apiService.fetchNotes(studentId);
-    setState(() {
-      notesList = notes;
-    });
+    try {
+      List<dynamic> notes =
+          await apiService.fetchNotes(); // No parameters needed
+      setState(() {
+        notesList = notes;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching notes: $e')),
+      );
+    }
   }
 
   void _launchURL(String url) async {
@@ -43,22 +48,24 @@ class _ViewNotesPageState extends State<ViewNotesPage> {
       appBar: AppBar(
         title: Text('View Notes'),
       ),
-      body: ListView.builder(
-        itemCount: notesList.length,
-        itemBuilder: (context, index) {
-          final note = notesList[index];
-          return ListTile(
-            title: Text('${note['subject']}'),
-            subtitle: Text('Uploaded at: ${note['uploaded_at']}'),
-            trailing: IconButton(
-              icon: Icon(Icons.download),
-              onPressed: () {
-                _launchURL('${Constants.baseUrl}/${note['file_path']}');
+      body: notesList.isEmpty
+          ? Center(child: Text('No notes available.'))
+          : ListView.builder(
+              itemCount: notesList.length,
+              itemBuilder: (context, index) {
+                final note = notesList[index];
+                return ListTile(
+                  title: Text('${note['subject']}'),
+                  subtitle: Text('Uploaded at: ${note['uploaded_at']}'),
+                  trailing: IconButton(
+                    icon: Icon(Icons.download),
+                    onPressed: () {
+                      _launchURL('${Constants.baseUrl}/${note['file_path']}');
+                    },
+                  ),
+                );
               },
             ),
-          );
-        },
-      ),
     );
   }
 }

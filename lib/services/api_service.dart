@@ -242,10 +242,9 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> fetchNotes(int studentId) async {
+  Future<List<dynamic>> fetchNotes() async {
     try {
-      final response = await http
-          .get(Uri.parse('$baseUrl/get_notes.php?student_id=$studentId'));
+      final response = await http.get(Uri.parse('$baseUrl/get_notes.php'));
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
