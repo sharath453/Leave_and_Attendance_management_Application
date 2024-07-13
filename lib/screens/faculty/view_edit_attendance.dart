@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/api_service.dart';
+import 'package:leave_management_app/services/api_service.dart';
 
 class ViewEditAttendancePage extends StatefulWidget {
   const ViewEditAttendancePage({super.key});
@@ -10,7 +10,7 @@ class ViewEditAttendancePage extends StatefulWidget {
 
 class _ViewEditAttendancePageState extends State<ViewEditAttendancePage> {
   final ApiService apiService = ApiService();
-  late Future<List<dynamic>> attendanceData;
+  late Future<Map<String, Map<String, double>>> attendanceData;
 
   @override
   void initState() {
@@ -22,9 +22,9 @@ class _ViewEditAttendancePageState extends State<ViewEditAttendancePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('View and Edit Attendance'),
+        title: Text('View Attendance'),
       ),
-      body: FutureBuilder<List<dynamic>>(
+      body: FutureBuilder<Map<String, Map<String, double>>>(
         future: attendanceData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -33,32 +33,21 @@ class _ViewEditAttendancePageState extends State<ViewEditAttendancePage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             final data = snapshot.data!;
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: data.length,
-                    itemBuilder: (context, index) {
-                      final attendance = data[index];
-                      return ListTile(
-                        title: Text(attendance['full_name']),
-                        subtitle: Text(
-                          'Total Classes Conducted: ${attendance['total_classes_conducted']} | Total Classes Attended: ${attendance['total_classes_attended']} | Attendance: ${attendance['attendance_percentage']}%',
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () {
-                            // Implement edit functionality
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+            return ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                final username = data.keys.elementAt(index);
+                final subjects = data[username]!;
+                return ExpansionTile(
+                  title: Text(username),
+                  children: subjects.entries.map((entry) {
+                    return ListTile(
+                      title: Text(entry.key),
+                      trailing: Text('${entry.value}%'),
+                    );
+                  }).toList(),
+                );
+              },
             );
           }
         },

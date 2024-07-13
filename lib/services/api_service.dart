@@ -119,11 +119,23 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> fetchAttendanceData() async {
+  Future<Map<String, Map<String, double>>> fetchAttendanceData() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/get_attendance.php'));
+      final response =
+          await http.get(Uri.parse('$baseUrl/fetch_attendance.php'));
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        Map<String, dynamic> data = json.decode(response.body);
+        Map<String, Map<String, double>> attendanceData = {};
+
+        data.forEach((username, subjects) {
+          Map<String, double> subjectData = {};
+          subjects.forEach((subject, value) {
+            subjectData[subject] = value.toDouble();
+          });
+          attendanceData[username] = subjectData;
+        });
+
+        return attendanceData;
       } else {
         throw Exception(
             'Failed to fetch attendance data: ${response.reasonPhrase}');
