@@ -1,0 +1,29 @@
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "leave_management_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode(['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+// Fetch fines
+$sql = "SELECT * FROM fines";
+$result = $conn->query($sql);
+
+$fines = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $fines[] = $row;
+    }
+}
+
+echo json_encode($fines);
+
+$conn->close();
+?>

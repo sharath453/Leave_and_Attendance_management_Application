@@ -1,0 +1,40 @@
+<?php
+header('Content-Type: application/json');
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "leave_management_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode(['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error]));
+}
+
+// Get the posted data
+$input = json_decode(file_get_contents("php://input"), true);
+
+if (isset($input['username']) && isset($input['fine_amount'])) {
+    $username = $conn->real_escape_string($input['username']);
+    $fine_amount = $conn->real_escape_string($input['fine_amount']);
+
+    $sql = "INSERT INTO fines (username, fine_amount) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sd", $username, $fine_amount);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Fine added successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $stmt->error]);
+    }
+
+    $stmt->close();
+} else {
+    echo json_encode(['success' => false, 'message' => 'Invalid input']);
+}
+
+$conn->close();
+?>
