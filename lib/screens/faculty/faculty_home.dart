@@ -13,16 +13,16 @@ class FacultyHomePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Faculty Home'),
-          bottom: TabBar(
-            tabs: const [
+          bottom: const TabBar(
+            tabs: [
               Tab(text: 'Upload Notes'),
               Tab(text: 'Upload Attendance'),
               Tab(text: 'View/Edit Attendance'),
             ],
           ),
         ),
-        body: TabBarView(
-          children: const [
+        body: const TabBarView(
+          children: [
             AddNotesPage(),
             UploadAttendancePage(),
             ViewEditAttendancePage(),

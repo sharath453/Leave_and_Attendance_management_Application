@@ -39,8 +39,7 @@ class ApiService {
       final response = await http.post(
         Uri.parse('$baseUrl/login.php'),
         headers: <String, String>{'Content-Type': 'application/json'},
-        body: jsonEncode(
-            <String, String>{'username': username, 'password': password}),
+        body: jsonEncode({'username': username, 'password': password}),
       );
       if (response.statusCode == 200) {
         return json.decode(response.body);
@@ -58,12 +57,12 @@ class ApiService {
       final response = await http.post(
         Uri.parse('$baseUrl/register.php'),
         headers: <String, String>{'Content-Type': 'application/json'},
-        body: jsonEncode(<String, String>{
+        body: jsonEncode({
           'full_name': fullName,
           'username': username,
           'password': password,
           'email': email,
-          'role': role
+          'role': role,
         }),
       );
       if (response.statusCode == 200) {
@@ -90,11 +89,11 @@ class ApiService {
       final response = await http.post(
         Uri.parse('$baseUrl/apply_leave.php'),
         headers: <String, String>{'Content-Type': 'application/json'},
-        body: jsonEncode(<String, dynamic>{
+        body: jsonEncode({
           'usn': '4AL21CS${studentId.toString().padLeft(3, '0')}',
           'start_date': startDate,
           'end_date': endDate,
-          'reason': reason
+          'reason': reason,
         }),
       );
       if (response.statusCode != 200) {
@@ -148,26 +147,76 @@ class ApiService {
   }
 
   Future<void> uploadAttendance(
-      String username, String subject, double attendancePercentage) async {
-    try {
-      final studentId = int.parse(
-          username.substring(7)); // Assuming username format '4AL21CS134'
+      String selectedSubject, Map<String, double> attendanceData) async {
+    String apiUrl = '$baseUrl/upload_attendance.php';
 
-      final response = await http.post(
-        Uri.parse('$baseUrl/upload_attendance.php'),
-        headers: <String, String>{'Content-Type': 'application/json'},
-        body: jsonEncode(<String, dynamic>{
-          'student_id': studentId,
-          'subject': subject,
-          'attendance_percentage': attendancePercentage
-        }),
-      );
-      if (response.statusCode != 200) {
-        throw Exception(
-            'Failed to upload attendance: ${response.reasonPhrase}');
+    // Map from subject display names to database column names
+    Map<String, String> subjectToColumnName = {
+      'Full Stack Development (Python Django)': 'full_stack_python_django',
+      'Software Engineering and Project Management':
+          'software_engineering_project_management',
+      'Full Stack Development (Python Django) Laboratory':
+          'full_stack_python_django_lab',
+      'Computer Graphics': 'computer_graphics',
+      'Advanced Java Programming': 'advanced_java_programming',
+      'Computer Graphics Laboratory': 'computer_graphics_lab',
+      'Soft Skills': 'soft_skills',
+      'Mini Project Laboratory': 'mini_project_lab',
+    };
+
+    // Check if the selected subject is mapped to a column
+    if (!subjectToColumnName.containsKey(selectedSubject)) {
+      throw Exception('Selected subject not mapped to a column');
+    }
+
+    String columnName = subjectToColumnName[selectedSubject]!;
+
+    try {
+      // Fetch usernames
+      List<String> usernames = await fetchUsernames();
+
+      // Check if any usernames are fetched
+      if (usernames.isEmpty) {
+        throw Exception('No usernames fetched');
+      }
+
+      // Iterate through each username and upload attendance
+      for (String username in usernames) {
+        double attendance =
+            attendanceData[username] ?? 0; // Default to 0 if not found
+
+        Map<String, dynamic> postData = {
+          'username': username,
+          'attendance': attendance,
+          'column': columnName, // Pass the column name
+        };
+
+        // Send POST request to upload attendance
+        var response = await http.post(
+          Uri.parse(apiUrl),
+          body: jsonEncode(postData),
+          headers: {'Content-Type': 'application/json'},
+        );
+
+        // Check the response status
+        if (response.statusCode == 200) {
+          var jsonResponse = jsonDecode(response.body);
+          if (jsonResponse['success'] != null && jsonResponse['success']) {
+            print('Attendance uploaded successfully for $username');
+          } else {
+            print(
+                'Failed to upload attendance for $username: ${jsonResponse['error']}');
+            throw Exception('Failed to upload attendance for $username');
+          }
+        } else {
+          print(
+              'Failed to upload attendance for $username: ${response.statusCode}');
+          throw Exception('Failed to upload attendance for $username');
+        }
       }
     } catch (e) {
-      throw Exception('Failed to upload attendance: $e');
+      print('Exception while uploading attendance: $e');
+      throw Exception('Failed to upload attendance');
     }
   }
 
@@ -190,10 +239,7 @@ class ApiService {
       final response = await http.post(
         Uri.parse('$baseUrl/submit_fine.php'),
         headers: <String, String>{'Content-Type': 'application/json'},
-        body: jsonEncode(<String, dynamic>{
-          'student_id': studentId,
-          'fine_amount': fineAmount
-        }),
+        body: jsonEncode({'student_id': studentId, 'fine_amount': fineAmount}),
       );
       if (response.statusCode != 200) {
         throw Exception('Failed to submit fine: ${response.reasonPhrase}');
@@ -233,34 +279,6 @@ class ApiService {
     }
   }
 
-  Future<List<String>> fetchUsernames() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/get_students.php'));
-      if (response.statusCode == 200) {
-        return List<String>.from(json.decode(response.body));
-      } else {
-        throw Exception('Failed to fetch usernames: ${response.reasonPhrase}');
-      }
-    } catch (e) {
-      throw Exception('Failed to fetch usernames: $e');
-    }
-  }
-
-  Future<void> addStudent(String username) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/get_students.php'),
-        headers: <String, String>{'Content-Type': 'application/json'},
-        body: jsonEncode(<String, dynamic>{'username': username}),
-      );
-      if (response.statusCode != 200) {
-        throw Exception('Failed to add student: ${response.reasonPhrase}');
-      }
-    } catch (e) {
-      throw Exception('Failed to add student: $e');
-    }
-  }
-
   Future<void> markLeaveAsApproved(int leaveId) async {
     try {
       final response = await http.post(
@@ -290,6 +308,27 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Failed to mark leave as rejected: $e');
+    }
+  }
+
+  Future<List<String>> fetchUsernames() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/get_usernames.php'));
+
+      if (response.statusCode == 200) {
+        final decodedResponse = json.decode(response.body);
+
+        // Ensure the response structure includes a success field
+        if (decodedResponse is List) {
+          return List<String>.from(decodedResponse);
+        } else {
+          throw Exception('Unexpected response format: $decodedResponse');
+        }
+      } else {
+        throw Exception('Failed to fetch usernames: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch usernames: $e');
     }
   }
 }

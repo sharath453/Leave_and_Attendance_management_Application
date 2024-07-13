@@ -9,11 +9,20 @@ class UploadAttendancePage extends StatefulWidget {
 }
 
 class _UploadAttendancePageState extends State<UploadAttendancePage> {
-  final ApiService apiService = ApiService();
-  String? selectedSubject;
-  int totalClassesConducted = 0;
-  Map<String, int> attendanceMap = {};
+  final List<String> columns = [
+    'Full Stack Development (Python Django)',
+    'Software Engineering and Project Management',
+    'Full Stack Development (Python Django) Laboratory',
+    'Computer Graphics',
+    'Advanced Java Programming',
+    'Computer Graphics Laboratory',
+    'Soft Skills',
+    'Mini Project Laboratory',
+  ];
+
+  String? selectedColumn;
   List<String> usernames = [];
+  Map<String, TextEditingController> controllers = {};
 
   @override
   void initState() {
@@ -21,54 +30,44 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     fetchUsernames();
   }
 
-  // Fetch usernames from the database
-  Future<void> fetchUsernames() async {
+  void fetchUsernames() async {
     try {
-      List<String> fetchedUsernames = await apiService.fetchUsernames();
+      List<String> fetchedUsernames = await ApiService().fetchUsernames();
       setState(() {
         usernames = fetchedUsernames;
+        for (var username in usernames) {
+          controllers[username] = TextEditingController();
+        }
       });
     } catch (e) {
-      print('Error fetching usernames: $e');
-      // Handle error gracefully, e.g., show a dialog to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching usernames: $e')),
+      );
     }
   }
 
-  // Submit attendance to the server
   void submitAttendance() async {
-    try {
-      if (selectedSubject == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please select a subject')),
-        );
-        return;
-      }
-
-      // Validate totalClassesConducted
-      if (totalClassesConducted <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text('Total classes conducted should be greater than zero')),
-        );
-        return;
-      }
-
-      for (int i = 0; i < usernames.length; i++) {
-        String username = usernames[i];
-        int attendedClasses = attendanceMap[username] ?? 0;
-        double attendancePercentage =
-            (attendedClasses / totalClassesConducted) * 100;
-        await apiService.uploadAttendance(
-            username, selectedSubject!, attendancePercentage);
-      }
+    if (selectedColumn == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Attendance submitted successfully')),
+        SnackBar(content: Text('Please select a subject')),
+      );
+      return;
+    }
+
+    Map<String, double> attendanceData = {};
+    for (var username in usernames) {
+      attendanceData[username] =
+          double.tryParse(controllers[username]!.text) ?? 0;
+    }
+
+    try {
+      await ApiService().uploadAttendance(selectedColumn!, attendanceData);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Attendance uploaded successfully')),
       );
     } catch (e) {
-      print('Error uploading attendance: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to submit attendance')),
+        SnackBar(content: Text('Failed to upload attendance: $e')),
       );
     }
   }
@@ -82,48 +81,23 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DropdownButtonFormField<String>(
+            DropdownButton<String>(
+              hint: Text('Select Subject'),
+              value: selectedColumn,
               isExpanded: true,
-              decoration: InputDecoration(
-                labelText: 'Select Subject',
-                border: OutlineInputBorder(),
-              ),
-              value: selectedSubject,
-              onChanged: (String? newValue) {
+              onChanged: (newValue) {
                 setState(() {
-                  selectedSubject = newValue!;
+                  selectedColumn = newValue;
                 });
               },
-              items: [
-                'Full Stack Development (Python Django)',
-                'Software Engineering and Project Management',
-                'Full Stack Development (Python Django) Laboratory',
-                'Computer Graphics',
-                'Advanced Java Programming',
-                'Computer Graphics Laboratory',
-                'Soft Skills',
-                'Mini Project Laboratory',
-              ].map<DropdownMenuItem<String>>((String subject) {
+              items: columns.map((column) {
                 return DropdownMenuItem<String>(
-                  value: subject,
-                  child: Text(subject),
+                  value: column,
+                  child: Text(column),
                 );
               }).toList(),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Total Classes Conducted',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  totalClassesConducted = int.tryParse(value) ?? 0;
-                });
-              },
             ),
             SizedBox(height: 16),
             Expanded(
@@ -131,19 +105,28 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                 itemCount: usernames.length,
                 itemBuilder: (context, index) {
                   String username = usernames[index];
-                  return ListTile(
-                    title: Text(username),
-                    subtitle: TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Classes Attended',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) {
-                        setState(() {
-                          attendanceMap[username] = int.tryParse(value) ?? 0;
-                        });
-                      },
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            username,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: controllers[username],
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'Attendance %',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
@@ -151,7 +134,7 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
             ),
             ElevatedButton(
               onPressed: submitAttendance,
-              child: Text('Submit Attendance'),
+              child: Text('Submit'),
             ),
           ],
         ),
