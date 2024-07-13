@@ -44,7 +44,7 @@ class HodHomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ViewAttendancePage(),
+                    builder: (context) => ViewEditAttendancePage(),
                   ),
                 );
               },

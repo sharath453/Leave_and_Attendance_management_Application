@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'apply_leave.dart';
-import 'view_attendance.dart';
+import 'view_attendance.dart'; // Updated import
 import 'view_fines.dart';
 import 'view_notes.dart';
 
@@ -30,7 +30,9 @@ class StudentHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ViewAttendancePage()),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ViewEditAttendancePage()), // Updated to use ViewEditAttendancePage
                 );
               },
               child: Text('View Attendance'),

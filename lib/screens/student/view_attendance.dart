@@ -1,34 +1,55 @@
 import 'package:flutter/material.dart';
-import '../../services/api_service.dart';
-import '../../widgets/attendance_card.dart';
+import 'package:leave_management_app/services/api_service.dart';
 
-class ViewAttendancePage extends StatelessWidget {
+class ViewEditAttendancePage extends StatefulWidget {
+  const ViewEditAttendancePage({super.key});
+
+  @override
+  _ViewEditAttendancePageState createState() => _ViewEditAttendancePageState();
+}
+
+class _ViewEditAttendancePageState extends State<ViewEditAttendancePage> {
   final ApiService apiService = ApiService();
+  late Future<Map<String, Map<String, double>>> attendanceData;
 
-  ViewAttendancePage({super.key});
+  @override
+  void initState() {
+    super.initState();
+    attendanceData = apiService.fetchAttendanceData();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Attendance'),
+        title: Text('View Attendance'),
       ),
-      body: FutureBuilder(
-        future: apiService.fetchAttendanceData(),
+      body: FutureBuilder<Map<String, Map<String, double>>>(
+        future: attendanceData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
+          } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            final data = snapshot.data!;
+            return ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                final username = data.keys.elementAt(index);
+                final subjects = data[username]!;
+                return ExpansionTile(
+                  title: Text(username),
+                  children: subjects.entries.map((entry) {
+                    return ListTile(
+                      title: Text(entry.key),
+                      trailing: Text('${entry.value}%'),
+                    );
+                  }).toList(),
+                );
+              },
+            );
           }
-          List attendanceData = snapshot.data as List;
-          return ListView.builder(
-            itemCount: attendanceData.length,
-            itemBuilder: (context, index) {
-              return AttendanceCard(attendance: attendanceData[index]);
-            },
-          );
         },
       ),
     );
