@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:leave_management_app/screens/hod/view_leave_requests.dart';
 import 'package:leave_management_app/screens/hod/approved_leave_application.dart';
 import 'package:leave_management_app/screens/hod/view_attendance.dart';
-import 'package:leave_management_app/screens/hod/rejected_leave_application.dart'; // Import the RejectedLeaveApplicationPage
+import 'package:leave_management_app/screens/hod/rejected_leave_application.dart';
+import 'package:leave_management_app/screens/hod/add_fine.dart'; // Import the AddFinePage
 
 class HodHomePage extends StatelessWidget {
   const HodHomePage({super.key});
@@ -55,12 +56,23 @@ class HodHomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        RejectedLeaveApplicationPage(), // Navigate to RejectedLeaveApplicationPage
+                    builder: (context) => RejectedLeaveApplicationPage(),
                   ),
                 );
               },
               child: Text('Rejected Leave Applications'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        AddFinePage(), // Navigate to AddFinePage
+                  ),
+                );
+              },
+              child: Text('Add Fine'),
             ),
           ],
         ),

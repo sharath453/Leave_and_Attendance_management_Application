@@ -246,6 +246,21 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> addFine(
+      String username, double fineAmount) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/add_fine.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'username': username, 'fine_amount': fineAmount}),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body); // Return the response as a Map
+    } else {
+      throw Exception('Failed to add fine');
+    }
+  }
+
   Future<void> addStudent(String username) async {
     final response = await http.post(
       Uri.parse('$baseUrl/add_student.php'), // Create this PHP file
