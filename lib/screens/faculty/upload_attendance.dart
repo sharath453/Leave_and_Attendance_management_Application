@@ -9,20 +9,36 @@ class UploadAttendancePage extends StatefulWidget {
 }
 
 class _UploadAttendancePageState extends State<UploadAttendancePage> {
-  final List<String> columns = [
-    'Full Stack Development (Python Django)',
-    'Software Engineering and Project Management',
-    'Full Stack Development (Python Django) Laboratory',
-    'Computer Graphics',
-    'Advanced Java Programming',
-    'Computer Graphics Laboratory',
-    'Soft Skills',
-    'Mini Project Laboratory',
-  ];
+  final Map<String, String> subjectColumnMap = {
+    'Full Stack Development (Python Django)': 'full_stack_python_django',
+    'Software Engineering and Project Management':
+        'software_engineering_project_management',
+    'Full Stack Development (Python Django) Laboratory':
+        'full_stack_python_django_lab',
+    'Computer Graphics': 'computer_graphics',
+    'Advanced Java Programming': 'advanced_java_programming',
+    'Computer Graphics Laboratory': 'computer_graphics_lab',
+    'Soft Skills': 'soft_skills',
+    'Mini Project Laboratory': 'mini_project_lab',
+  };
 
+  List<String> columns;
   String? selectedColumn;
   List<String> usernames = [];
   Map<String, TextEditingController> controllers = {};
+  TextEditingController newUsernameController = TextEditingController();
+
+  _UploadAttendancePageState()
+      : columns = [
+          'Full Stack Development (Python Django)',
+          'Software Engineering and Project Management',
+          'Full Stack Development (Python Django) Laboratory',
+          'Computer Graphics',
+          'Advanced Java Programming',
+          'Computer Graphics Laboratory',
+          'Soft Skills',
+          'Mini Project Laboratory',
+        ];
 
   @override
   void initState() {
@@ -61,13 +77,41 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
     }
 
     try {
-      await ApiService().uploadAttendance(selectedColumn!, attendanceData);
+      String? mappedColumn = subjectColumnMap[selectedColumn];
+      if (mappedColumn == null) {
+        throw Exception('Selected subject not mapped to a column');
+      }
+
+      await ApiService().uploadAttendance(mappedColumn, attendanceData);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Attendance uploaded successfully')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to upload attendance: $e')),
+      );
+    }
+  }
+
+  void addNewStudent() async {
+    String newUsername = newUsernameController.text.trim();
+    if (newUsername.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a username')),
+      );
+      return;
+    }
+
+    try {
+      await ApiService().addStudent(newUsername); // New method to be created
+      newUsernameController.clear();
+      fetchUsernames(); // Refresh the list of usernames
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Student added successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add student: $e')),
       );
     }
   }
@@ -131,6 +175,17 @@ class _UploadAttendancePageState extends State<UploadAttendancePage> {
                   );
                 },
               ),
+            ),
+            TextField(
+              controller: newUsernameController,
+              decoration: InputDecoration(
+                labelText: 'Enter new student username',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: addNewStudent,
+              child: Text('Add Student'),
             ),
             ElevatedButton(
               onPressed: submitAttendance,

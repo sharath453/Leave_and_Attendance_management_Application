@@ -234,6 +234,18 @@ class ApiService {
     }
   }
 
+  Future<void> addStudent(String username) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/add_student.php'), // Create this PHP file
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'username': username}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to add student: ${response.reasonPhrase}');
+    }
+  }
+
   Future<void> submitFine(int studentId, double fineAmount) async {
     try {
       final response = await http.post(
