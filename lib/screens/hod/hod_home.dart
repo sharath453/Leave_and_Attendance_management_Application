@@ -5,6 +5,7 @@ import 'package:leave_management_app/screens/hod/view_attendance.dart';
 import 'package:leave_management_app/screens/hod/rejected_leave_application.dart';
 import 'package:leave_management_app/screens/hod/add_fine.dart';
 import 'package:leave_management_app/screens/hod/view_fines.dart' as hod;
+import 'package:leave_management_app/screens/login_screen.dart'; // Import your login page
 
 class HodHomePage extends StatelessWidget {
   const HodHomePage({super.key});
@@ -14,6 +15,26 @@ class HodHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('HOD Home'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      LoginPage(), // Replace with your login page
+                ),
+              );
+            },
+            child: Text(
+              'Logout',
+              style: TextStyle(
+                color: Colors.black, // Text color
+                fontSize: 16, // Font size
+              ),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Padding(

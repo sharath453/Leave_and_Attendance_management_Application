@@ -6,6 +6,7 @@ import 'view_fines.dart';
 import 'view_notes.dart';
 import 'make_payments.dart';
 import 'rejected_leave_application.dart'; // Import the new file
+import 'package:leave_management_app/screens/login_screen.dart'; // Import your login page
 
 class StudentHomePage extends StatelessWidget {
   const StudentHomePage({super.key});
@@ -15,6 +16,26 @@ class StudentHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Student Home'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      LoginPage(), // Replace with your login page
+                ),
+              );
+            },
+            child: Text(
+              'Logout',
+              style: TextStyle(
+                color: Colors.black, // Text color
+                fontSize: 16, // Font size
+              ),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
