@@ -9,6 +9,7 @@ class ViewLeaveRequestsPage extends StatefulWidget {
 class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
   final ApiService _apiService = ApiService();
   List<dynamic> leaveRequests = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -20,10 +21,16 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
     try {
       final response = await _apiService.viewLeaveApplications('4AL21CS');
       setState(() {
-        leaveRequests = response;
+        leaveRequests = response
+            .map((request) => {...request, 'processed': false})
+            .toList();
+        isLoading = false;
       });
     } catch (e) {
       // Handle error
+      setState(() {
+        isLoading = false;
+      });
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -46,76 +53,77 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
       appBar: AppBar(
         title: Text('View Leave Requests'),
       ),
-      body: leaveRequests.isEmpty
+      body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: leaveRequests.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: EdgeInsets.all(8.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Username: ${leaveRequests[index]['username']}',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Start Date: ${leaveRequests[index]['start_date']}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Text(
-                          'End Date: ${leaveRequests[index]['end_date']}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Reason: ${leaveRequests[index]['reason']}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          : leaveRequests.isEmpty
+              ? Center(child: Text('No recent leave applications found.'))
+              : ListView.builder(
+                  itemCount: leaveRequests.length,
+                  itemBuilder: (context, index) {
+                    final request = leaveRequests[index];
+                    final isProcessed = request['processed'];
+
+                    return Card(
+                      margin: EdgeInsets.all(8.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                String username =
-                                    leaveRequests[index]['username'];
-                                approveLeave(username);
-                              },
-                              child: Text('Approve'),
+                            Text(
+                              'Username: ${request['username']}',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                String username =
-                                    leaveRequests[index]['username'];
-                                rejectLeave(username);
-                              },
-                              child: Text('Reject'),
+                            SizedBox(height: 8),
+                            Text(
+                              'Start Date: ${request['start_date']}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            Text(
+                              'End Date: ${request['end_date']}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Reason: ${request['reason']}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: isProcessed
+                                      ? null
+                                      : () => approveLeave(index),
+                                  child: Text('Approve'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: isProcessed
+                                      ? null
+                                      : () => rejectLeave(index),
+                                  child: Text('Reject'),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 
-  void approveLeave(String username) {
+  void approveLeave(int index) {
+    final username = leaveRequests[index]['username'];
     try {
       _apiService.markLeaveAsApproved(username).then((value) {
         setState(() {
-          // Update UI or show success message if needed
-          fetchLeaveRequests(); // Refresh the leave requests list
+          leaveRequests[index]['processed'] = true;
           showMessage('Leave Approved');
         });
       }).catchError((error) {
@@ -150,12 +158,12 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
     }
   }
 
-  void rejectLeave(String username) {
+  void rejectLeave(int index) {
+    final username = leaveRequests[index]['username'];
     try {
       _apiService.markLeaveAsRejected(username).then((value) {
         setState(() {
-          // Update UI or show success message if needed
-          fetchLeaveRequests(); // Refresh the leave requests list
+          leaveRequests[index]['processed'] = true;
           showMessage('Leave Rejected');
         });
       }).catchError((error) {
