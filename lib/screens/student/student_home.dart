@@ -20,16 +20,17 @@ class StudentHomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
+            CustomButton(
+              text: 'Apply for Leave',
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ApplyLeavePage()),
                 );
               },
-              child: Text('Apply for Leave'),
             ),
-            ElevatedButton(
+            CustomButton(
+              text: 'View Attendance',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -37,27 +38,27 @@ class StudentHomePage extends StatelessWidget {
                       builder: (context) => ViewEditAttendancePage()),
                 );
               },
-              child: Text('View Attendance'),
             ),
-            ElevatedButton(
+            CustomButton(
+              text: 'View Fines',
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ViewFinesPage()),
                 );
               },
-              child: Text('View Fines'),
             ),
-            ElevatedButton(
+            CustomButton(
+              text: 'View Notes',
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ViewNotesPage()),
                 );
               },
-              child: Text('View Notes'),
             ),
-            ElevatedButton(
+            CustomButton(
+              text: 'Make Payments',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -66,9 +67,9 @@ class StudentHomePage extends StatelessWidget {
                           MakePaymentsPage()), // Navigate to MakePaymentsPage
                 );
               },
-              child: Text('Make Payments'),
             ),
-            ElevatedButton(
+            CustomButton(
+              text: 'Approved Leave Applications',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -77,9 +78,9 @@ class StudentHomePage extends StatelessWidget {
                           ApprovedLeaveApplicationPage()), // Navigate to ApprovedLeaveApplicationPage
                 );
               },
-              child: Text('Approved Leave Applications'),
             ),
-            ElevatedButton(
+            CustomButton(
+              text: 'Rejected Leave Applications',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -88,9 +89,41 @@ class StudentHomePage extends StatelessWidget {
                           RejectedLeaveApplicationPage()), // Navigate to RejectedLeaveApplicationPage
                 );
               },
-              child: Text('Rejected Leave Applications'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+
+  const CustomButton({required this.text, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: SizedBox(
+        width: double.infinity, // Make the button wide
+        height: 50, // Set a fixed height for the button
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.white, // Text color
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12), // Curved edges
+            ),
+            elevation: 2, // Light shadow effect
+          ),
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 16),
+          ),
         ),
       ),
     );
