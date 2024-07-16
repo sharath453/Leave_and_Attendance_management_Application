@@ -29,25 +29,69 @@ class MakePaymentsPage extends StatelessWidget {
         title: Text('Make Payments'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: _launchGooglePay,
-              child: Image.asset(
-                'assets/images/google_pay_logo.png',
-                height: 50, // Adjust the height as needed
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 25.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              Text(
+                'Select the Payment Application',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[700],
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _launchPaytm,
-              child: Image.asset(
-                'assets/images/paytm_logo.png',
-                height: 50, // Adjust the height as needed
+              const SizedBox(height: 50),
+
+              // Google Pay button
+              ElevatedButton(
+                onPressed: _launchGooglePay,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  elevation: 5,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/images/google_pay_logo.png',
+                      height: 30, // Adjust the height as needed
+                    ),
+                    SizedBox(width: 10),
+                    Text('Google Pay'),
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+
+              // Paytm button
+              ElevatedButton(
+                onPressed: _launchPaytm,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  elevation: 5,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/images/paytm_logo.png',
+                      height: 30, // Adjust the height as needed
+                    ),
+                    SizedBox(width: 10),
+                    Text('Paytm'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
