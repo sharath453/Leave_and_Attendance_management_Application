@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:leave_management_app/screens/hod/approved_leave_application.dart';
 import 'apply_leave.dart';
 import 'view_attendance.dart';
 import 'view_fines.dart';
 import 'view_notes.dart';
-import 'make_payments.dart'; // Import the new file
+import 'make_payments.dart';
+import 'rejected_leave_application.dart'; // Import the new file
 
 class StudentHomePage extends StatelessWidget {
   const StudentHomePage({super.key});
@@ -65,6 +67,28 @@ class StudentHomePage extends StatelessWidget {
                 );
               },
               child: Text('Make Payments'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ApprovedLeaveApplicationPage()), // Navigate to ApprovedLeaveApplicationPage
+                );
+              },
+              child: Text('Approved Leave Applications'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          RejectedLeaveApplicationPage()), // Navigate to RejectedLeaveApplicationPage
+                );
+              },
+              child: Text('Rejected Leave Applications'),
             ),
           ],
         ),
