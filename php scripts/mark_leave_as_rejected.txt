@@ -47,6 +47,9 @@ try {
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to store in rejected_leave_applications table.']);
         }
+
+        $stmt_select->close();
+        $stmt_insert_rejected->close();
     } else {
         echo json_encode(['success' => false, 'message' => 'Error updating leave status: ' . $stmt_update->error]);
     }

@@ -18,37 +18,38 @@ if ($conn->connect_error) {
 // Get JSON input and decode it
 $input = json_decode(file_get_contents('php://input'), true);
 
+// Retrieve username from input
+$username = $input['username'];
+
 try {
     // Update the leave request status in the 'leave_applications' table to 'Approved'
-    $usernamePrefix = '4AL21CS';
-    $sql_update_leave = "UPDATE leave_applications SET status = 'Approved' WHERE username LIKE ?";
+    $sql_update_leave = "UPDATE leave_applications SET status = 'Approved' WHERE username = ?";
     $stmt_update = $conn->prepare($sql_update_leave);
-    $param = $usernamePrefix . "%";
-    $stmt_update->bind_param("s", $param);
+    $stmt_update->bind_param("s", $username);
 
     if ($stmt_update->execute()) {
-        // Fetch details of all approved leave applications
-        $sql_select_approved = "SELECT username, start_date, end_date, reason, NOW() as approved_at FROM leave_applications WHERE username LIKE ? AND status = 'Approved'";
-        $stmt_select = $conn->prepare($sql_select_approved);
-        $stmt_select->bind_param("s", $param);
+        // Fetch the details of the approved leave application
+        $sql_select_leave = "SELECT * FROM leave_applications WHERE username = ?";
+        $stmt_select = $conn->prepare($sql_select_leave);
+        $stmt_select->bind_param("s", $username);
         $stmt_select->execute();
         $result = $stmt_select->get_result();
+        $leaveApplication = $result->fetch_assoc();
 
-        // Store details in approved_leave_applications table
-        $sql_insert_approved = "INSERT INTO approved_leave_applications (username, start_date, end_date, reason, approved_at) VALUES (?, ?, ?, ?, ?)";
-        $stmt_insert = $conn->prepare($sql_insert_approved);
+        // Insert the details into approved_leave_applications table
+        $sql_insert_approved = "INSERT INTO approved_leave_applications (username, start_date, end_date, reason, approved_at) VALUES (?, ?, ?, ?, NOW())";
+        $stmt_insert_approved = $conn->prepare($sql_insert_approved);
+        $stmt_insert_approved->bind_param("ssss", $leaveApplication['username'], $leaveApplication['start_date'], $leaveApplication['end_date'], $leaveApplication['reason']);
+        $stmt_insert_approved->execute();
 
-        while ($row = $result->fetch_assoc()) {
-            $stmt_insert->bind_param("sssss", $row['username'], $row['start_date'], $row['end_date'], $row['reason'], $row['approved_at']);
-            $stmt_insert->execute();
-        }
-
-        // Check if rows were inserted successfully
-        if ($stmt_insert->affected_rows > 0) {
-            echo json_encode(['success' => true, 'message' => 'Leave applications marked as approved and stored successfully']);
+        if ($stmt_insert_approved->affected_rows > 0) {
+            echo json_encode(['success' => true, 'message' => 'Leave application approved and stored in approved_leave_applications table successfully.']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'No rows inserted into approved_leave_applications table']);
+            echo json_encode(['success' => false, 'message' => 'Failed to store in approved_leave_applications table.']);
         }
+
+        $stmt_select->close();
+        $stmt_insert_approved->close();
     } else {
         echo json_encode(['success' => false, 'message' => 'Error updating leave status: ' . $stmt_update->error]);
     }
@@ -56,9 +57,6 @@ try {
     echo json_encode(['success' => false, 'message' => 'Exception: ' . $e->getMessage()]);
 }
 
-// Close statements and connection
 $stmt_update->close();
-$stmt_select->close();
-$stmt_insert->close();
 $conn->close();
 ?>
