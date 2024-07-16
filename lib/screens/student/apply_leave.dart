@@ -191,9 +191,24 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
               decoration: InputDecoration(labelText: 'Reason'),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isButtonEnabled ? applyForLeave : null,
-              child: Text('Apply'),
+            SizedBox(
+              width: double.infinity, // Make the button wide
+              height: 50, // Set a fixed height for the button
+              child: ElevatedButton(
+                onPressed: _isButtonEnabled ? applyForLeave : null,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white, // Text color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12), // Curved edges
+                  ),
+                  elevation: 2, // Light shadow effect
+                ),
+                child: Text(
+                  'Apply',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
             ),
           ],
         ),

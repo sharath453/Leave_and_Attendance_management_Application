@@ -94,16 +94,40 @@ class _AddNotesPageState extends State<AddNotesPage> {
               }).toList(),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: selectFile,
-              child: Text(selectedFile == null
-                  ? 'Select PDF File'
-                  : 'File Selected: ${selectedFile!.path.split('/').last}'),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: selectFile,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue, // Text color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+                child: Text(selectedFile == null
+                    ? 'Select PDF File'
+                    : 'File Selected: ${selectedFile!.path.split('/').last}'),
+              ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: uploadNotes,
-              child: Text('Upload Notes'),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: uploadNotes,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green, // Text color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+                child: Text('Upload Notes'),
+              ),
             ),
           ],
         ),
