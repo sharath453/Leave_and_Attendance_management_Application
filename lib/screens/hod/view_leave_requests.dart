@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:leave_management_app/services/api_service.dart';
 
 class ViewLeaveRequestsPage extends StatefulWidget {
-  const ViewLeaveRequestsPage({super.key});
-
   @override
   _ViewLeaveRequestsPageState createState() => _ViewLeaveRequestsPageState();
 }
@@ -87,15 +85,17 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                int leaveId = leaveRequests[index]['leave_id'];
-                                approveLeave(leaveId);
+                                String username =
+                                    leaveRequests[index]['username'];
+                                approveLeave(username);
                               },
                               child: Text('Approve'),
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                int leaveId = leaveRequests[index]['leave_id'];
-                                rejectLeave(leaveId);
+                                String username =
+                                    leaveRequests[index]['username'];
+                                rejectLeave(username);
                               },
                               child: Text('Reject'),
                             ),
@@ -110,11 +110,14 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
     );
   }
 
-  void approveLeave(int leaveId) {
+  void approveLeave(String username) {
     try {
-      _apiService.markLeaveAsApproved(leaveId).then((value) {
-        // Update UI or show success message if needed
-        fetchLeaveRequests(); // Refresh the leave requests list
+      _apiService.markLeaveAsApproved(username).then((value) {
+        setState(() {
+          // Update UI or show success message if needed
+          fetchLeaveRequests(); // Refresh the leave requests list
+          showMessage('Leave Approved');
+        });
       }).catchError((error) {
         showDialog(
           context: context,
@@ -147,11 +150,14 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
     }
   }
 
-  void rejectLeave(int leaveId) {
+  void rejectLeave(String username) {
     try {
-      _apiService.markLeaveAsRejected(leaveId).then((value) {
-        // Update UI or show success message if needed
-        fetchLeaveRequests(); // Refresh the leave requests list
+      _apiService.markLeaveAsRejected(username).then((value) {
+        setState(() {
+          // Update UI or show success message if needed
+          fetchLeaveRequests(); // Refresh the leave requests list
+          showMessage('Leave Rejected');
+        });
       }).catchError((error) {
         showDialog(
           context: context,
@@ -182,5 +188,14 @@ class _ViewLeaveRequestsPageState extends State<ViewLeaveRequestsPage> {
         ),
       );
     }
+  }
+
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 }
