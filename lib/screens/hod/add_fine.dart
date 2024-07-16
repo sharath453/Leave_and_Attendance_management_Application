@@ -12,6 +12,21 @@ class _AddFinePageState extends State<AddFinePage> {
   final ApiService apiService = ApiService();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _fineAmountController = TextEditingController();
+  bool _isButtonEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _usernameController.addListener(_updateButtonState);
+    _fineAmountController.addListener(_updateButtonState);
+  }
+
+  void _updateButtonState() {
+    setState(() {
+      _isButtonEnabled = _usernameController.text.isNotEmpty &&
+          _fineAmountController.text.isNotEmpty;
+    });
+  }
 
   void _submitFine() {
     final String username = _usernameController.text;
@@ -38,6 +53,13 @@ class _AddFinePageState extends State<AddFinePage> {
   }
 
   @override
+  void dispose() {
+    _usernameController.dispose();
+    _fineAmountController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -49,17 +71,27 @@ class _AddFinePageState extends State<AddFinePage> {
           children: [
             TextField(
               controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
+              decoration: InputDecoration(labelText: 'Enter USN'),
             ),
             TextField(
               controller: _fineAmountController,
-              decoration: InputDecoration(labelText: 'Fine Amount'),
+              decoration: InputDecoration(labelText: 'Fine Amount in Rupees'),
               keyboardType: TextInputType.number,
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _submitFine,
-              child: Text('Add Fine'),
+            SizedBox(
+              width: double.infinity, // Make the button wide
+              height: 50, // Set a fixed height
+              child: ElevatedButton(
+                onPressed: _isButtonEnabled ? _submitFine : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Button color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12), // Rounded corners
+                  ),
+                ),
+                child: Text('Add Fine'),
+              ),
             ),
           ],
         ),
