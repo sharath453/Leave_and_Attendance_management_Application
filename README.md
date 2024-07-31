@@ -20,7 +20,19 @@ This project is an Android application designed for managing leave requests and 
 
 ## Screenshots
 
-![Leave_and_Attendance_Management](https://github.com/user-attachments/assets/22801726-c5df-4a8e-9aae-6ae66752371b)
+![Leave_and_Attendance_Management](https://github.com/user-attachments/assets/88d50360-62f8-48da-9da8-f69e4c9e6d82)
+![Leave_and_Attendance_Management](https://github.com/user-attachments/assets/78c9c401-7986-4458-9f0e-c7e18b7b5983)
+![Leave_and_Attendance_Management](https://github.com/user-attachments/assets/8b5a5afe-bf45-4769-895a-89a0f114dd00)
+![Leave_and_Attendance_Management](https://github.com/user-attachments/assets/f6bda735-bee5-4e53-b444-8bb601259b90)
+![Leave_and_Attendance_Management](https://github.com/user-attachments/assets/03d7a0d2-dffa-4f97-b1f4-b68f9297fb4c)
+![Leave_and_Attendance_Management](https://github.com/user-attachments/assets/25c50911-60a7-4009-957d-cd384fda6300)
+![view attendance](https://github.com/user-attachments/assets/4bf75cd6-2036-43d7-a2d1-94e5c84fec78)
+![view fines](https://github.com/user-attachments/assets/12d86aee-1385-4619-94a9-88964b3f94fa)
+![uplode attendance](https://github.com/user-attachments/assets/9e54451d-6007-40d1-8d60-2d4bbad7f2d4)
+![add fines](https://github.com/user-attachments/assets/a290a28f-3518-4ba0-b2af-a3ac697b059c)
+![payments](https://github.com/user-attachments/assets/97aec5de-aa56-4b14-b0ca-f8a72d27c9d1)
+![hod home page](https://github.com/user-attachments/assets/fadd18e5-968d-4dac-b1d1-7a668ef40f64)
+
 
 ## Built With
 
