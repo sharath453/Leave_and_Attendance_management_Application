@@ -55,7 +55,7 @@ To get a local copy up and running follow these simple steps.
 
 1. Clone the repo:<br><br>
    ```sh
-   git clone https://github.com/sharath453/leave-attendance-management.git
+   git clone https://github.com/sharath453/Leave_and_Attendance_management_Application.git
 2. Navigate to the project directory:
  ```sh
 cd leave-attendance-management
@@ -88,4 +88,4 @@ Email - alsharath66@gmail.com<br>
 LinkedIn - [Sharath A L](https://www.linkedin.com/in/sharath-a-l-877754249/)
 
 Project Link
-https://github.com/sharath453/leave-attendance-management.git
+https://github.com/sharath453/Leave_and_Attendance_management_Application.git
